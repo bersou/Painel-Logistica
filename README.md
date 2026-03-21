@@ -1,4 +1,4 @@
-# 📦 Sistema de Gerenciamento de Logística - Cubbo
+# 📦 Sistema de Gerenciamento de Logística
 
 ![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB)
 ![Vite](https://img.shields.io/badge/vite-%23646CFF.svg?style=for-the-badge&logo=vite&logoColor=white)
@@ -7,7 +7,8 @@
 ![Netlify](https://img.shields.io/badge/netlify-%23000000.svg?style=for-the-badge&logo=netlify&logoColor=#00C7B7)
 ![PWA](https://img.shields.io/badge/PWA-Suportado-blueviolet?style=for-the-badge)
 
-O **Sistema de Gerenciamento de Logística Cubbo** é uma plataforma avançada (Single-Page Application) desenvolvida para gerenciar, otimizar e rastrear processos logísticos de ponta a ponta. Focado na persona do Gerente de Logística, o sistema permite o controle de estoque em tempo real (WMS), monitoramento de SLAs e o rastreamento preciso de frotas e pacotes.
+O **Sistema de Gerenciamento de Logística** 
+é uma plataforma avançada (Single-Page Application) desenvolvida para gerenciar, otimizar e rastrear processos logísticos de ponta a ponta. Focado na persona do Gerente de Logística, o sistema permite o controle de estoque em tempo real (WMS), monitoramento de SLAs e o rastreamento preciso de frotas e pacotes.
 
 ## ✨ Principais Funcionalidades
 
@@ -38,4 +39,4 @@ Este protótipo foi construído utilizando um ecossistema moderno de desenvolvim
 
 1. **Clone ou acesse a pasta do projeto:**
    ```bash
-   cd logistica-cubbo
+   cd painel-logistica

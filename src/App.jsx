@@ -6,40 +6,39 @@ import {
   ShieldAlert, Check, ChevronRight, TrendingUp, 
   Thermometer, BatteryCharging, QrCode, MapPinned,
   Satellite, Server, History, MessageSquareWarning,
-  Wrench, CalendarClock, HardDrive, Wifi
+  Wrench, CalendarClock, HardDrive, Wifi, BarChart3,
+  Globe, Database, Cpu
 } from 'lucide-react';
 
-// --- ESTILOS INJETADOS ---
-const CustomStyles = () => (
-  <style>{`
-    .animate-gradient-text {
-      background: linear-gradient(to right, #4f46e5, #0ea5e9, #10b981, #4f46e5);
-      background-size: 200% auto;
-      color: transparent;
-      -webkit-background-clip: text;
-      background-clip: text;
-      animation: shine 4s linear infinite;
-    }
-    @keyframes shine { to { background-position: 200% center; } }
-    .no-scrollbar::-webkit-scrollbar { display: none; }
-    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-  `}</style>
-);
+// =====================================================================
+// 1. DADOS E CONFIGURAÇÕES DE BASE
+// =====================================================================
 
-// =====================================================================
-// 📸 IMAGEM DE CAPA DO RASTREIO E LOGOS
-// =====================================================================
-const TRACKING_BG_URL = 'https://res.cloudinary.com/dnymahpi7/image/upload/v1774112612/Picsart_26-03-21_14-01-59-284_2_pyqjog.jpg';
+const NAV_ITEMS = [
+  { id: 'dashboard', icon: Activity, label: 'Painel' },
+  { id: 'estoque', icon: Box, label: 'Estoque' },
+  { id: 'rastreamento', icon: Search, label: 'Rastreio' },
+  { id: 'rotas', icon: MapIcon, label: 'Rotas' },
+];
+
+const CHART_DATA = [
+  { time: '06:00', volume: 480, status: 'Normal' },
+  { time: '08:00', volume: 850, status: 'Atenção' },
+  { time: '10:00', volume: 1450, status: 'Pico' },
+  { time: '12:00', volume: 760, status: 'Normal' },
+  { time: '14:00', volume: 1100, status: 'Alto' },
+  { time: 'Agora', volume: 1320, status: 'Pico' }
+];
 
 const CLIENT_LOGOS = {
-  'Mercado Livre': 'https://res.cloudinary.com/dnymahpi7/image/upload/v1774110431/mercado-livre-logo-png_seeklogo-264236_onqmjq.png',
-  'Dafiti': 'https://res.cloudinary.com/dnymahpi7/image/upload/v1774109766/dafiti-logo-png_seeklogo-214989_poot5a.png',
-  'Shopee': 'https://res.cloudinary.com/dnymahpi7/image/upload/v1774109781/images_lbk692.png',
-  'Americanas': 'https://res.cloudinary.com/dnymahpi7/image/upload/v1774110431/images_wcoxnd.jpg',
-  'Amazon': 'https://res.cloudinary.com/dnymahpi7/image/upload/v1774109743/images_1_abboq2.jpg',
   'Apple': 'https://res.cloudinary.com/dnymahpi7/image/upload/v1774109722/747_hjikst.png',
+  'Amazon': 'https://res.cloudinary.com/dnymahpi7/image/upload/v1774109743/images_1_abboq2.jpg',
   'LG': 'https://res.cloudinary.com/dnymahpi7/image/upload/v1774109524/1000316462_plxqcy.webp',
+  'Mercado Livre': 'https://res.cloudinary.com/dnymahpi7/image/upload/v1774110431/mercado-livre-logo-png_seeklogo-264236_onqmjq.png',
   'PlayStation': 'https://res.cloudinary.com/dnymahpi7/image/upload/v1774111735/playstation_drdbmt.jpg',
+  'Americanas': 'https://res.cloudinary.com/dnymahpi7/image/upload/v1774110431/images_wcoxnd.jpg',
+  'Shopee': 'https://res.cloudinary.com/dnymahpi7/image/upload/v1774109781/images_lbk692.png',
+  'Dafiti': 'https://res.cloudinary.com/dnymahpi7/image/upload/v1774109766/dafiti-logo-png_seeklogo-214989_poot5a.png',
 };
 
 const USER_PHOTOS = {
@@ -54,611 +53,331 @@ const USER_PHOTOS = {
   'Pedro Alves': 'https://randomuser.me/api/portraits/men/67.jpg',
 };
 
-// --- COMPONENTES VISUAIS (Avatares e Logos) ---
-const CompanyLogo = ({ name, className = "w-10 h-10" }) => {
-  const [imgError, setImgError] = useState(false);
-  const logoUrl = CLIENT_LOGOS[name];
-
-  if (!logoUrl || imgError) {
-    return (
-      <div className={`${className} bg-indigo-100 text-indigo-700 rounded-xl flex items-center justify-center font-black text-xs shadow-sm border border-indigo-200 shrink-0`}>
-        {name.substring(0, 2).toUpperCase()}
-      </div>
-    );
-  }
-
-  return (
-    <div className={`${className} bg-white rounded-xl flex items-center justify-center shadow-sm border border-slate-200 overflow-hidden p-1 shrink-0`}>
-      <img src={logoUrl} alt={name} className="w-full h-full object-contain rounded-lg" onError={() => setImgError(true)} />
-    </div>
-  );
-};
-
-const Avatar = ({ name, className = "w-10 h-10" }) => {
-  const photoUrl = USER_PHOTOS[name];
-  return (
-    <div className={`${className} rounded-full border-2 border-white shadow-md overflow-hidden bg-slate-200 shrink-0 flex items-center justify-center`}>
-      {photoUrl ? (
-        <img src={photoUrl} alt={name} className="w-full h-full object-cover" />
-      ) : (
-        <span className="font-black text-slate-500 text-xs">{name.substring(0,2).toUpperCase()}</span>
-      )}
-    </div>
-  );
-};
-
-// --- BANCO DE DADOS MOCK (EXPANDIDO) ---
 const MOCK_INVENTORY = [
-  { id: 1, sku: 'SYNC-EL-001', name: 'iPhone 15 Pro Max 256GB', qty: 1250, client: 'Apple', status: 'Adequado', corredor: 'A-12', prateleira: 'P-04' },
-  { id: 2, sku: 'SYNC-MD-045', name: 'Cadeira Gamer DXRacer', qty: 15, client: 'Amazon', status: 'Crítico', corredor: 'C-05', prateleira: 'P-01' },
-  { id: 3, sku: 'SYNC-TV-099', name: 'Smart TV LG OLED 65"', qty: 340, client: 'LG', status: 'Atenção', corredor: 'B-02', prateleira: 'P-02' },
-  { id: 4, sku: 'SYNC-AC-102', name: 'AirPods Pro 2', qty: 4500, client: 'Mercado Livre', status: 'Adequado', corredor: 'A-01', prateleira: 'P-09' },
-  { id: 5, sku: 'SYNC-CG-011', name: 'PlayStation 5 Slim', qty: 89, client: 'PlayStation', status: 'Crítico', corredor: 'A-10', prateleira: 'P-03' },
-  { id: 6, sku: 'SYNC-UD-301', name: 'Air Fryer Mondial 4L', qty: 3200, client: 'Americanas', status: 'Adequado', corredor: 'D-15', prateleira: 'P-01' },
-  { id: 7, sku: 'SYNC-SP-887', name: 'Tênis Nike Revolution', qty: 1100, client: 'Shopee', status: 'Adequado', corredor: 'G-11', prateleira: 'P-08' },
-  { id: 8, sku: 'SYNC-FW-991', name: 'Bolsa Couro Legítimo', qty: 25, client: 'Dafiti', status: 'Crítico', corredor: 'F-02', prateleira: 'P-05' },
-  // Novos Itens para preencher a tela
-  { id: 9, sku: 'SYNC-EL-002', name: 'MacBook Pro M3 14"', qty: 450, client: 'Apple', status: 'Adequado', corredor: 'A-13', prateleira: 'P-01' },
-  { id: 10, sku: 'SYNC-MD-046', name: 'Kindle Paperwhite 16GB', qty: 2100, client: 'Amazon', status: 'Adequado', corredor: 'C-06', prateleira: 'P-05' },
-  { id: 11, sku: 'SYNC-AC-103', name: 'Echo Dot 5ª Geração', qty: 530, client: 'Mercado Livre', status: 'Atenção', corredor: 'A-02', prateleira: 'P-02' },
-  { id: 12, sku: 'SYNC-UD-302', name: 'Geladeira Frost Free 400L', qty: 12, client: 'Americanas', status: 'Crítico', corredor: 'D-16', prateleira: 'P-10' },
-  { id: 13, sku: 'SYNC-CG-012', name: 'Controle DualSense PS5', qty: 850, client: 'PlayStation', status: 'Adequado', corredor: 'A-10', prateleira: 'P-04' },
-  { id: 14, sku: 'SYNC-TV-100', name: 'Monitor Gamer LG UltraGear 27"', qty: 120, client: 'LG', status: 'Atenção', corredor: 'B-03', prateleira: 'P-01' },
+  { id: 1, sku: 'SYNC-EL-001', name: 'iPhone 15 Pro Max', qty: 1250, client: 'Apple', status: 'Adequado' },
+  { id: 2, sku: 'SYNC-MD-045', name: 'Cadeira Gamer DXR', qty: 15, client: 'Amazon', status: 'Crítico' },
+  { id: 3, sku: 'SYNC-TV-099', name: 'Smart TV LG OLED', qty: 340, client: 'LG', status: 'Atenção' },
+  { id: 4, sku: 'SYNC-AC-102', name: 'AirPods Pro 2', qty: 4500, client: 'Mercado Livre', status: 'Adequado' },
+  { id: 5, sku: 'SYNC-CG-011', name: 'PlayStation 5 Slim', qty: 89, client: 'PlayStation', status: 'Crítico' },
+  { id: 6, sku: 'SYNC-UD-301', name: 'Air Fryer Mondial', qty: 3200, client: 'Americanas', status: 'Adequado' },
+  { id: 7, sku: 'SYNC-SP-887', name: 'Tênis Nike Rev', qty: 1100, client: 'Shopee', status: 'Adequado' },
+  { id: 8, sku: 'SYNC-FW-991', name: 'Bolsa Couro Legít', qty: 25, client: 'Dafiti', status: 'Crítico' },
 ];
 
 const MOCK_ROUTES = [
-  { id: 'VTR-01', driver: 'João Pedro', phone: '(11) 98765-4321', plate: 'XYZ-9090', status: 'Em Rota', location: 'Marginal Tietê, São Paulo', dest: 'CD Barueri, SP', eta: '45 min', speed: '82 km/h', temp: '18°C', cargo: [{ item: 'PlayStation 5', qty: 15, client: 'PlayStation' }, { item: 'iPhone 15 Pro', qty: 50, client: 'Apple' }] },
-  { id: 'VTR-02', driver: 'Marcos Silva', phone: '(11) 91234-5678', plate: 'QWE-1234', status: 'Atrasado', location: 'Rod. Dutra, Km 210', dest: 'São José dos Campos', eta: '2h 10m', speed: '0 km/h', temp: '22°C', cargo: [{ item: 'Smart TV LG', qty: 30, client: 'LG' }, { item: 'Air Fryer Mondial', qty: 120, client: 'Americanas' }] },
-  { id: 'VTR-03', driver: 'Carla Dias', phone: '(11) 95555-4444', plate: 'ABC-5678', status: 'Em Rota', location: 'Rod. Castelo Branco', dest: 'Sorocaba, SP', eta: '55 min', speed: '90 km/h', temp: '19°C', cargo: [{ item: 'Tênis Nike', qty: 200, client: 'Shopee' }, { item: 'Bolsa Couro', qty: 55, client: 'Dafiti' }] },
-  { id: 'VTR-04', driver: 'Carlos Silva', phone: '(11) 99999-1111', plate: 'BRA-3R56', status: 'Em Rota', location: 'Rua Augusta', dest: 'Centro de SP', eta: '15 min', speed: '30 km/h', temp: '20°C', cargo: [{ item: 'Cadeira Gamer', qty: 10, client: 'Amazon' }, { item: 'AirPods Pro 2', qty: 150, client: 'Mercado Livre' }] },
-  // Novos Motoristas
-  { id: 'VTR-05', driver: 'Ana Souza', phone: '(11) 98888-2222', plate: 'MNO-5566', status: 'Em Rota', location: 'Rod. dos Bandeirantes', dest: 'Campinas, SP', eta: '1h 20m', speed: '85 km/h', temp: '21°C', cargo: [{ item: 'MacBook Pro M3', qty: 25, client: 'Apple' }] },
-  { id: 'VTR-06', driver: 'Fernando Costa', phone: '(11) 97777-3333', plate: 'GHI-9876', status: 'Parado', location: 'Posto Graal, Rod. Anhanguera', dest: 'Ribeirão Preto, SP', eta: '3h 15m', speed: '0 km/h', temp: '23°C', cargo: [{ item: 'Geladeira Frost Free', qty: 5, client: 'Americanas' }] },
-  { id: 'VTR-07', driver: 'Lucia Gomes', phone: '(11) 96666-4444', plate: 'JKL-4321', status: 'Em Rota', location: 'Av. dos Bandeirantes', dest: 'Aeroporto de Congonhas', eta: '25 min', speed: '60 km/h', temp: '19°C', cargo: [{ item: 'Kindle Paperwhite', qty: 300, client: 'Amazon' }, { item: 'Echo Dot 5ª Geração', qty: 150, client: 'Mercado Livre' }] },
-  { id: 'VTR-08', driver: 'Pedro Alves', phone: '(11) 95555-5555', plate: 'DEF-6789', status: 'Atenção', location: 'Rodoanel Mário Covas', dest: 'Santo André, SP', eta: '1h 05m', speed: '40 km/h', temp: '20°C', cargo: [{ item: 'Monitor Gamer LG', qty: 40, client: 'LG' }, { item: 'Controle DualSense', qty: 100, client: 'PlayStation' }] },
+  { id: 'VTR-01', driver: 'João Pedro', plate: 'XYZ-9090', status: 'Em Rota', dest: 'CD Barueri, SP', pos: { t: '35%', l: '30%' } },
+  { id: 'VTR-02', driver: 'Marcos Silva', plate: 'QWE-1234', status: 'Atrasado', dest: 'S. J. dos Campos', pos: { t: '60%', l: '45%' } },
+  { id: 'VTR-03', driver: 'Carla Dias', plate: 'ABC-5678', status: 'Em Rota', dest: 'Sorocaba, SP', pos: { t: '25%', l: '75%' } },
+  { id: 'VTR-04', driver: 'Carlos Silva', plate: 'BRA-3R56', status: 'Em Rota', dest: 'Centro de SP', pos: { t: '55%', l: '85%' } },
+  { id: 'VTR-05', driver: 'Ana Souza', plate: 'MNO-5566', status: 'Em Rota', dest: 'Campinas, SP', pos: { t: '40%', l: '15%' } },
+  { id: 'VTR-06', driver: 'Fernando Costa', plate: 'GHI-9876', status: 'Parado', dest: 'Ribeirão Preto', pos: { t: '80%', l: '25%' } },
+  { id: 'VTR-07', driver: 'Lucia Gomes', plate: 'JKL-4321', status: 'Em Rota', dest: 'Congonhas', pos: { t: '15%', l: '45%' } },
+  { id: 'VTR-08', driver: 'Pedro Alves', plate: 'DEF-6789', status: 'Atenção', dest: 'Santo André', pos: { t: '90%', l: '60%' } },
 ];
 
-const MOCK_SHIPMENTS = {
+const MOCK_PROBLEMS = [
+  { id: 'OC-991', type: 'Destinatário Ausente', severity: 'Atenção', driver: 'Marcos Silva', time: '10:20', loc: 'Av. Paulista, SP', desc: 'Tentativa de entrega sem sucesso por falta de recebedor no local.' },
+  { id: 'OC-992', type: 'Pneu Furado', severity: 'Crítico', driver: 'Carlos Silva', time: '09:45', loc: 'Rod. Castelo Branco', desc: 'Veículo imobilizado no acostamento. Necessário envio de suporte técnico.' },
+  { id: 'OC-993', type: 'Atraso em Rota', severity: 'Normal', driver: 'João Pedro', time: '11:30', loc: 'Marginal Tietê', desc: 'Fluxo intenso de veículos impactando o ETA em 20 minutos.' }
+];
+
+const TRACKING_DATA = {
   'SYNC-84920': {
-    id: 'SYNC-84920', client: 'Mercado Livre', destination: 'Av. Paulista, 1000 - SP', status: 'Em Trânsito', location: 'Rod. dos Bandeirantes, Km 45', eta: 'Hoje, 14:30', progress: 65, driver: 'Carlos Silva', plate: 'BRA-3R56',
-    events: [{ time: '09:15', desc: 'Em trânsito', done: true }, { time: '06:30', desc: 'Saiu do Centro de Distribuição', done: true }]
+    id: 'SYNC-84920', client: 'Mercado Livre', driver: 'Carlos Silva', status: 'Em Trânsito', progress: 65, eta: '14:30', 
+    events: [{ t: '11:15', d: 'Em trânsito na Rodovia' }, { t: '09:30', d: 'Expedido do CD' }, { t: '07:00', d: 'Carga Bipada' }]
   }
 };
 
-const DETAILS_MOCK = {
-  entregas: [
-    { id: '#ENT-001', time: '10:45', client: 'Mercado Livre', dest: 'Rua Augusta, SP', driver: 'João Pedro', sign: 'Recebido por: Maria S.' },
-    { id: '#ENT-002', time: '10:30', client: 'Amazon', dest: 'Av. Brasil, Campinas', driver: 'Marcos Silva', sign: 'Recebido por: Portaria' },
-    { id: '#ENT-003', time: '09:15', client: 'Americanas', dest: 'Centro, Guarulhos', driver: 'Carla Dias', sign: 'Recebido pelo Titular' },
-    { id: '#ENT-004', time: '08:50', client: 'Dafiti', dest: 'Vila Madalena, SP', driver: 'Carlos Silva', sign: 'Recebido por: Síndico' },
-  ],
-  transito: MOCK_ROUTES.filter(r => r.status !== 'Parado'),
-  problemas: [
-    { 
-      id: 'OC-991', type: 'Destinatário Ausente', route: 'VTR-02', plate: 'QWE-1234', 
-      time: '10:20', severity: 'Atenção', driver: 'Marcos Silva', phone: '(11) 91234-5678',
-      location: 'Av. Paulista, 1500 - São Paulo, SP',
-      desc: 'Motorista tentou contato via interfone e celular por 15 minutos. Ninguém atendeu na portaria. O zelador informou que o cliente está viajando.' 
-    },
-    { 
-      id: 'OC-992', type: 'Pneu Furado na Via', route: 'VTR-04', plate: 'BRA-3R56', 
-      time: '09:45', severity: 'Crítico', driver: 'Carlos Silva', phone: '(11) 99999-1111',
-      location: 'Rodovia Anhanguera, Km 23 - Sentido SP',
-      desc: 'Pneu traseiro direito estourou em um buraco. Veículo está imobilizado no acostamento. A carga está segura e baú trancado. Necessita de guincho.' 
-    },
-  ]
-};
+// =====================================================================
+// 2. COMPONENTES VISUAIS
+// =====================================================================
 
-const CHART_DATA = [
-  { time: '06:00', volume: 480, status: 'normal' }, 
-  { time: '08:00', volume: 450, status: 'attention' }, 
-  { time: '10:00', volume: 1100, status: 'critical' }, 
-  { time: '12:00', volume: 600, status: 'normal' }, 
-  { time: '14:00', volume: 720, status: 'attention' }, 
-  { time: 'Agora', volume: 1220, status: 'critical' }
-];
+const Avatar = ({ name, className = "w-10 h-10" }) => (
+  <div className={`${className} rounded-full border-2 border-white shadow-md overflow-hidden bg-slate-200 shrink-0 flex items-center justify-center`}>
+    {USER_PHOTOS[name] ? <img src={USER_PHOTOS[name]} alt={name} className="w-full h-full object-cover" /> : <span className="text-[10px] font-bold">{name.substring(0, 2)}</span>}
+  </div>
+);
+
+const CompanyLogo = ({ name, className = "w-10 h-10" }) => (
+  <div className={`${className} bg-white rounded-xl flex items-center justify-center shadow-sm border border-slate-200 overflow-hidden p-1 shrink-0`}>
+    {CLIENT_LOGOS[name] ? <img src={CLIENT_LOGOS[name]} alt={name} className="w-full h-full object-contain rounded-lg" /> : <div className="text-[10px] font-bold">{name.substring(0, 2)}</div>}
+  </div>
+);
+
+// =====================================================================
+// 3. APLICAÇÃO PRINCIPAL (APP)
+// =====================================================================
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [isDark, setIsDark] = useState(false); 
-  
+  const [isDark, setIsDark] = useState(false);
+  const [selectedBar, setSelectedBar] = useState(null);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [selectedRoute, setSelectedRoute] = useState(null);
+  const [activeModal, setActiveModal] = useState(null);
   const [trackingId, setTrackingId] = useState('');
   const [searchedShipment, setSearchedShipment] = useState(null);
-  const [isSearching, setIsSearching] = useState(false);
-  const [searchError, setSearchError] = useState('');
-  
-  const [activeModal, setActiveModal] = useState(null);
-  const [selectedProduct, setSelectedProduct] = useState(null);
-  const [selectedDelivery, setSelectedDelivery] = useState(null);
-  const [selectedRoute, setSelectedRoute] = useState(null);
-  const [selectedProblem, setSelectedProblem] = useState(null);
-  const [selectedSystem, setSelectedSystem] = useState(null); // Estado para o modal do sistema
-  const [activeBar, setActiveBar] = useState(null);
+  const [searchError, setSearchError] = useState(false);
 
-  const toggleTheme = () => setIsDark(!isDark);
-
-  // --- TEMAS DINÂMICOS ---
   const theme = {
-    bg: isDark ? 'bg-slate-950' : 'bg-slate-50',
-    card: isDark ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-100',
-    cardHover: isDark ? 'hover:bg-slate-800' : 'hover:shadow-md',
-    textMain: isDark ? 'text-slate-100' : 'text-slate-900',
+    bg: isDark ? 'bg-slate-950 text-white' : 'bg-slate-50 text-slate-900',
+    card: isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100',
     textSec: isDark ? 'text-slate-400' : 'text-slate-500',
     border: isDark ? 'border-slate-800' : 'border-slate-100',
-    navBottom: isDark ? 'bg-slate-950/95 border-slate-800' : 'bg-white/95 border-slate-200',
-    header: isDark ? 'bg-slate-950/90 border-slate-800' : 'bg-slate-50/90 border-slate-200',
-    input: isDark ? 'bg-slate-900 border-slate-700 text-white placeholder:text-slate-500' : 'bg-white border-slate-200 text-slate-800',
-    modalBg: isDark ? 'bg-slate-950' : 'bg-slate-50',
-    modalHeader: isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100',
-    modalContentBg: isDark ? 'bg-slate-900' : 'bg-white'
+    nav: isDark ? 'bg-slate-950/90 border-slate-800' : 'bg-white/90 border-slate-100',
   };
-
-  const handleTrackingSearch = (e) => {
-    e.preventDefault();
-    if (!trackingId.trim()) return;
-    setSearchError(''); setIsSearching(true); setSearchedShipment(null);
-    setTimeout(() => {
-      const result = MOCK_SHIPMENTS[trackingId.toUpperCase()];
-      if (result) setSearchedShipment(result);
-      else setSearchError('Código não encontrado. Tente SYNC-84920');
-      setIsSearching(false);
-    }, 800);
-  };
-
-  const navItems = [
-    { id: 'dashboard', icon: Activity, label: 'Painel' },
-    { id: 'estoque', icon: Box, label: 'Estoque' },
-    { id: 'rastreamento', icon: Search, label: 'Rastreio' },
-    { id: 'rotas', icon: MapIcon, label: 'Rotas' },
-  ];
 
   const getStatusColor = (status) => {
-    if (status === 'Adequado' || status === 'Normal' || status === 'Em Rota') return 'bg-emerald-100/20 text-emerald-600 border border-emerald-200/30';
-    if (status === 'Atenção' || status === 'Parado') return 'bg-amber-100/20 text-amber-500 border border-amber-200/30';
-    if (status === 'Crítico' || status === 'Atrasado' || status === 'Instável') return 'bg-red-100/20 text-red-500 border border-red-200/30';
-    return 'bg-slate-100/10 text-slate-400';
+    if (status === 'Adequado' || status === 'Em Rota' || status === 'Normal') return 'bg-emerald-500/10 text-emerald-600';
+    if (status === 'Atenção' || status === 'Atrasado' || status === 'Alto') return 'bg-amber-500/10 text-amber-500';
+    return 'bg-red-500/10 text-red-500';
   };
 
-  // --- COMPONENTE MODAL GLOBAL ---
+  const handleSearch = (e) => {
+    e.preventDefault();
+    const result = TRACKING_DATA[trackingId.toUpperCase()];
+    if (result) {
+      setSearchedShipment(result);
+      setSearchError(false);
+    } else {
+      setSearchedShipment(null);
+      setSearchError(true);
+    }
+  };
+
   const Modal = ({ title, onClose, children }) => (
-    <div className="fixed inset-0 z-[100] flex items-end md:items-center justify-center bg-slate-900/80 backdrop-blur-sm animate-in fade-in duration-300">
-      <div className={`${theme.modalBg} w-full max-w-3xl h-[85vh] md:h-auto md:max-h-[85vh] rounded-t-[2.5rem] md:rounded-[2.5rem] flex flex-col shadow-2xl animate-in slide-in-from-bottom-10 overflow-hidden relative border ${theme.border}`}>
-        <div className={`flex justify-between items-center p-5 md:p-6 ${theme.modalHeader} z-10 shadow-sm sticky top-0`}>
-          <h3 className={`font-black text-xl md:text-2xl ${theme.textMain} tracking-tight`}>{title}</h3>
-          <button onClick={onClose} className={`p-2 rounded-full transition-all ${isDark ? 'bg-slate-800 text-slate-300 hover:bg-slate-700' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}>
-            <X className="w-5 h-5" />
-          </button>
+    <div className="fixed inset-0 z-[100] flex items-end md:items-center justify-center bg-slate-900/80 backdrop-blur-sm p-4">
+      <div className={`${isDark ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-100 text-slate-900'} w-full max-w-2xl rounded-[2rem] flex flex-col shadow-2xl overflow-hidden border animate-in slide-in-from-bottom-5 duration-300`}>
+        <div className="flex justify-between items-center p-6 border-b border-slate-100 dark:border-slate-800">
+          <h3 className="font-black text-xl tracking-tight">{title}</h3>
+          <button onClick={onClose} className="p-2 bg-slate-100 dark:bg-slate-800 rounded-full hover:scale-110 transition-transform"><X className="w-5 h-5"/></button>
         </div>
-        <div className="p-5 md:p-6 overflow-y-auto flex-1 pb-10 no-scrollbar">
-          {children}
-        </div>
+        <div className="p-6 overflow-y-auto max-h-[75vh] no-scrollbar">{children}</div>
       </div>
     </div>
   );
-  
-  const renderNav = () => (
-    <>
-      <nav className={`md:hidden fixed bottom-0 left-0 right-0 ${theme.navBottom} backdrop-blur-md border-t pb-safe pt-2 px-4 flex justify-around z-50 transition-colors duration-300`}>
-        {navItems.map((item) => {
-          const isActive = activeTab === item.id;
-          return (
-            <button key={item.id} onClick={() => {setActiveTab(item.id); window.scrollTo(0,0);}} className="relative flex flex-col items-center p-2 w-full transition-all duration-300">
-              <div className={`relative p-2.5 rounded-xl transition-all duration-300 ${isActive ? 'bg-indigo-600 text-white scale-110 shadow-[0_5px_15px_rgba(79,70,229,0.3)]' : 'text-slate-400 hover:text-indigo-500'}`}>
-                <item.icon className="w-6 h-6" strokeWidth={isActive ? 2.5 : 2} />
-              </div>
-              <span className={`text-[10px] mt-1.5 font-bold transition-all ${isActive ? 'text-indigo-600 uppercase tracking-widest' : 'text-slate-400'}`}>{item.label}</span>
-            </button>
-          )
-        })}
-      </nav>
 
-      <aside className={`hidden md:flex flex-col w-[260px] h-screen bg-slate-950 text-white p-6 sticky top-0 shadow-2xl z-40 border-r border-slate-900 shrink-0`}>
-        <div onClick={toggleTheme} className="flex items-center gap-3 mb-10 cursor-pointer group hover:bg-white/5 p-2 rounded-xl transition-all" title="Mudar Tema">
-          <div className="bg-gradient-to-tr from-indigo-600 to-cyan-500 p-2.5 rounded-xl shadow-lg shadow-indigo-500/30 group-hover:scale-105 transition-transform shrink-0">
-            <Hexagon className="w-6 h-6 text-white" />
-          </div>
-          <div className="flex flex-col justify-center">
-            <span className="text-2xl font-black tracking-tight text-white leading-none">LOGISYNC</span>
-            <span className="text-[9px] font-black text-indigo-400 uppercase tracking-widest mt-0.5">Inteligência Logística</span>
-          </div>
+  return (
+    <div className={`min-h-screen ${theme.bg} flex font-sans transition-colors duration-500 pb-20 md:pb-0`}>
+      <style>{`
+        .animate-gradient-text {
+          background: linear-gradient(to right, #4f46e5, #0ea5e9, #10b981, #4f46e5);
+          background-size: 200% auto;
+          color: transparent;
+          -webkit-background-clip: text;
+          background-clip: text;
+          animation: shine 4s linear infinite;
+        }
+        @keyframes shine { to { background-position: 200% center; } }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      `}</style>
+
+      {/* SIDEBAR PC */}
+      <aside className="hidden md:flex flex-col w-[260px] h-screen bg-slate-950 text-white p-6 sticky top-0 shrink-0 border-r border-slate-900">
+        <div className="flex items-center gap-4 mb-10 cursor-pointer group" onClick={() => setIsDark(!isDark)}>
+          <div className="bg-gradient-to-tr from-indigo-600 to-cyan-500 p-2.5 rounded-xl shadow-lg group-hover:scale-105 transition-transform"><Hexagon className="w-6 h-6 text-white" /></div>
+          <div><h2 className="text-xl font-black">LOGISYNC</h2><p className="text-[9px] font-black text-indigo-400 uppercase tracking-widest mt-0.5">SLA 98,05%</p></div>
         </div>
-
         <div className="space-y-2 flex-1">
-          {navItems.map((item) => {
-            const isActive = activeTab === item.id;
-            return (
-              <button key={item.id} onClick={() => {setActiveTab(item.id); window.scrollTo(0,0);}} className={`w-full flex items-center gap-4 px-4 py-3.5 rounded-xl font-bold transition-all duration-200 group ${isActive ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/20' : 'text-slate-400 hover:bg-slate-900 hover:text-white'}`}>
-                <item.icon className="w-5 h-5" /> 
-                <span className="text-sm tracking-wide">{item.label}</span>
-              </button>
-            )
-          })}
+          {NAV_ITEMS.map(item => (
+            <button key={item.id} onClick={() => setActiveTab(item.id)} className={`w-full flex items-center gap-4 px-4 py-3.5 rounded-xl font-bold transition-all ${activeTab === item.id ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-500 hover:text-white hover:bg-white/5'}`}>
+              <item.icon className="w-5 h-5" /> <span className="text-sm uppercase tracking-wide">{item.label}</span>
+            </button>
+          ))}
         </div>
         <div className="flex items-center gap-3 pt-6 border-t border-slate-800 mt-auto">
           <Avatar name="José Bernardo" className="w-10 h-10" />
           <div className="text-left">
-            <p className="text-sm font-black text-white leading-tight">José Bernardo</p>
-            <p className="text-xs font-bold text-indigo-400">Gerente Geral</p>
+            <p className="text-sm font-black leading-tight text-white">José Bernardo</p>
+            <p className="text-[9px] font-black text-indigo-400 uppercase">Gestor Geral</p>
           </div>
         </div>
       </aside>
-    </>
-  );
 
-  return (
-    <div className={`min-h-screen ${theme.bg} flex font-sans selection:bg-indigo-500/30 selection:text-indigo-200 pb-20 md:pb-0 transition-colors duration-500`}>
-      <CustomStyles />
-      {renderNav()}
-
-      {/* EXPANSÃO DE LAYOUT: O max-w agora é 1600px para aproveitar telas grandes como a do seu PC */}
-      <main className="flex-1 w-full 2xl:max-w-[1600px] mx-auto md:px-10 md:py-8 animate-in fade-in duration-300 overflow-x-hidden">
+      {/* MAIN CONTENT */}
+      <main className="flex-1 w-full max-w-[1500px] mx-auto md:px-10 md:py-8 animate-in fade-in duration-500 overflow-x-hidden">
         
         {/* HEADER MOBILE */}
-        <header className={`md:hidden flex items-center justify-between p-4 ${theme.header} sticky top-0 z-30 backdrop-blur-md border-b transition-colors duration-500`}>
-          <div className="flex items-center gap-2.5 cursor-pointer group" onClick={toggleTheme} title="Mudar Tema">
-            <div className="bg-gradient-to-tr from-indigo-600 to-cyan-500 p-2 rounded-lg shadow-md group-hover:scale-105 transition-transform shrink-0">
-              <Hexagon className="w-5 h-5 text-white" />
-            </div>
-            <div className="flex flex-col justify-center">
-              <span className={`text-xl font-black ${theme.textMain} tracking-tight leading-none`}>LOGISYNC</span>
-              <span className={`text-[8px] sm:text-[9px] font-black ${theme.textSec} uppercase tracking-widest mt-0.5 hidden min-[320px]:block`}>Inteligência Logística</span>
-            </div>
+        <header className={`md:hidden flex items-center justify-between p-4 ${theme.nav} sticky top-0 z-50 backdrop-blur-md border-b`}>
+          <div className="flex items-center gap-2.5" onClick={() => setIsDark(!isDark)}>
+            <div className="bg-gradient-to-tr from-indigo-600 to-cyan-500 p-2 rounded-lg shadow-md"><Hexagon className="w-5 h-5 text-white" /></div>
+            <span className="text-xl font-black tracking-tight">LOGISYNC</span>
           </div>
-          <Avatar name="José Bernardo" className="w-10 h-10 shrink-0" />
+          <Avatar name="José Bernardo" className="w-9 h-9" />
         </header>
 
-        <div className="px-5 md:px-0 mt-5 md:mt-0">
-
-          {/* =========================================
-              ABA 1: DASHBOARD
-          ============================================= */}
+        <div className="p-4 md:p-0 space-y-6">
+          
+          {/* DASHBOARD */}
           {activeTab === 'dashboard' && (
-            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
+            <div className="space-y-6">
               <div>
-                <h1 className={`text-2xl md:text-3xl font-black ${theme.textMain} tracking-tight`}>
-                  Olá, <span className="animate-gradient-text">José Bernardo</span>.
-                </h1>
-                <p className={`${theme.textSec} mt-1 font-medium text-sm`}>Visão executiva da sua operação hoje.</p>
+                <h1 className="text-2xl md:text-3xl font-black tracking-tight">Olá, <span className="animate-gradient-text">José Bernardo</span>.</h1>
+                <p className={`${theme.textSec} text-xs font-bold mt-1 uppercase tracking-widest`}>SLA Operacional em 98,05%.</p>
               </div>
-
-              {/* KPIs */}
-              <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
+              
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
                 {[
-                  { id: 'entregas', label: 'Entregas Hoje', value: '1.432', trend: '+12%', icon: Truck, color: 'from-blue-600 to-cyan-500' },
-                  { id: 'transito', label: 'Em Trânsito', value: '385', trend: 'Estável', icon: Navigation, color: 'from-orange-500 to-amber-400' },
-                  { id: 'problemas', label: 'Problemas', value: '12', trend: '-2%', icon: AlertTriangle, color: 'from-rose-600 to-red-500' },
-                  { id: 'sla', label: 'Meta de SLA', value: '98.5%', trend: '+0.5%', icon: CheckCircle2, color: 'from-emerald-600 to-emerald-400' },
+                  { id: 'entregas', l: 'Entregas Hoje', v: '1.432', icon: Truck, c: 'from-blue-600 to-cyan-500' },
+                  { id: 'transito', l: 'Em Trânsito', v: '385', icon: Navigation, c: 'from-orange-500 to-amber-400' },
+                  { id: 'problemas', l: 'Ocorrências', v: '12', icon: AlertTriangle, c: 'from-rose-600 to-red-500' },
+                  { id: 'sla', l: 'SLA Geral', v: '98,05%', icon: CheckCircle2, c: 'from-emerald-600 to-emerald-400' },
                 ].map((kpi, idx) => (
-                  <button key={idx} onClick={() => setActiveModal(kpi.id)} className={`text-left ${theme.card} p-5 md:p-6 rounded-2xl border ${theme.border} ${theme.cardHover} transition-all duration-200 relative overflow-hidden group focus:outline-none focus:ring-2 focus:ring-indigo-500/30`}>
-                    <div className={`absolute -top-4 -right-4 p-2 opacity-5 group-hover:opacity-10 transition-all transform group-hover:scale-110 ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                      <kpi.icon className="w-24 h-24 md:w-32 md:h-32" />
-                    </div>
-                    <div className="flex justify-between items-start mb-4">
-                      <div className={`inline-flex p-2.5 rounded-xl bg-gradient-to-tr ${kpi.color} shadow-md text-white`}>
-                        <kpi.icon className="w-6 h-6 md:w-8 md:h-8" />
-                      </div>
-                      <ChevronRight className={`w-5 h-5 ${theme.textSec} group-hover:text-indigo-500`} />
-                    </div>
-                    <p className={`text-xs md:text-sm ${theme.textSec} font-bold uppercase tracking-wider mb-1`}>{kpi.label}</p>
-                    <p className={`text-3xl md:text-5xl font-black ${theme.textMain} tracking-tight`}>{kpi.value}</p>
-                    <div className="mt-4">
-                       <span className={`text-[10px] md:text-xs font-bold px-2 py-1 rounded-md ${kpi.trend.includes('+') ? 'text-emerald-600 bg-emerald-100/20 border border-emerald-200/30' : kpi.trend.includes('-') ? 'text-red-500 bg-red-100/20 border border-red-200/30' : 'text-slate-400 bg-slate-100/10 border border-slate-200/20'}`}>{kpi.trend} em 24h</span>
-                    </div>
-                  </button>
+                  <div key={idx} onClick={() => setActiveModal(kpi.id)} className={`${theme.card} p-4 md:p-6 rounded-[2rem] border shadow-sm cursor-pointer hover:shadow-md transition-all active:scale-95`}>
+                    <div className={`inline-flex p-2 rounded-xl bg-gradient-to-tr ${kpi.c} text-white mb-3 shadow-md`}><kpi.icon className="w-5 h-5" /></div>
+                    <p className={`text-[8px] md:text-[10px] font-black uppercase tracking-widest ${theme.textSec} mb-0.5`}>{kpi.l}</p>
+                    <p className="text-xl md:text-3xl font-black">{kpi.v}</p>
+                  </div>
                 ))}
               </div>
 
-              {/* Gráfico */}
-              <div className={`${theme.card} p-5 md:p-8 rounded-2xl border ${theme.border}`}>
-                <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-10 gap-3">
-                  <div>
-                    <h3 className={`font-black text-lg md:text-xl ${theme.textMain} flex items-center gap-2`}><TrendingUp className="w-5 h-5 text-indigo-500"/> Volume de Expedição</h3>
-                  </div>
-                  <div className="flex gap-4">
-                    <span className="flex items-center gap-1.5 text-xs font-bold text-emerald-500"><span className="w-3 h-3 rounded-full bg-emerald-500 shadow-md"></span> Normal</span>
-                    <span className="flex items-center gap-1.5 text-xs font-bold text-amber-500"><span className="w-3 h-3 rounded-full bg-amber-500 shadow-md"></span> Atenção</span>
-                    <span className="flex items-center gap-1.5 text-xs font-bold text-red-500"><span className="w-3 h-3 rounded-full bg-red-500 shadow-md"></span> Crítico</span>
-                  </div>
+              {/* GRÁFICO INTERATIVO NO PAINEL */}
+              <div className={`${theme.card} p-5 md:p-8 rounded-[2.5rem] border shadow-sm overflow-hidden`}>
+                <div className="flex justify-between items-center mb-10">
+                  <h3 className="font-black text-sm md:text-lg flex items-center gap-2"><BarChart3 className="w-5 h-5 text-indigo-500" /> Fluxo de Expedição</h3>
+                  <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Clique nas barras para dados</span>
                 </div>
                 
-                <div className="h-48 md:h-64 flex items-end justify-between gap-2 md:gap-4 px-1 relative">
-                  {CHART_DATA.map((data, i) => {
-                    const heightPercent = (data.volume / 1450) * 100;
-                    const isActive = activeBar === i;
-                    let barColor = data.status === 'critical' ? 'bg-red-500' : data.status === 'attention' ? 'bg-amber-400' : 'bg-emerald-500';
-                    if (isActive) {
-                      barColor = data.status === 'critical' ? 'bg-red-600 shadow-[0_0_20px_rgba(220,38,38,0.5)]' : data.status === 'attention' ? 'bg-amber-500 shadow-[0_0_20px_rgba(245,158,11,0.5)]' : 'bg-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.5)]';
-                    }
+                <div className="h-48 md:h-80 flex items-end justify-between gap-1.5 md:gap-4 relative px-1 border-b border-slate-100 dark:border-slate-800 pb-2">
+                  <div className="absolute left-0 right-0 border-t border-dashed border-slate-300 dark:border-slate-700 z-0" style={{ bottom: '60%' }}>
+                    <span className="text-[7px] md:text-[9px] font-black text-slate-400 absolute -top-4 left-0 uppercase tracking-tighter">Meta (900)</span>
+                  </div>
 
+                  {CHART_DATA.map((data, i) => {
+                    const h = (data.volume / 1600) * 100;
+                    const isSelected = selectedBar === i;
                     return (
-                      <div key={i} onClick={() => setActiveBar(isActive ? null : i)} className="w-full h-full flex items-end justify-center relative cursor-pointer group">
-                        {isActive && (
-                          <div className={`absolute -top-16 left-1/2 -translate-x-1/2 ${isDark ? 'bg-white text-slate-900' : 'bg-slate-900 text-white'} px-4 py-2 rounded-xl text-xs font-black shadow-xl whitespace-nowrap z-20 animate-in zoom-in-95`}>
-                            <span className="text-indigo-500 text-[10px] uppercase block leading-none mb-1">{data.time}</span>
-                            <span className="text-sm">{data.volume} Caixas</span>
-                            <div className={`absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 ${isDark ? 'bg-white' : 'bg-slate-900'} rotate-45`}></div>
+                      <div key={i} onClick={() => setSelectedBar(isSelected ? null : i)} className="w-full h-full flex flex-col items-center justify-end group cursor-pointer relative z-10">
+                        {isSelected && (
+                          <div className={`absolute -top-12 ${isDark ? 'bg-white text-slate-900' : 'bg-slate-900 text-white'} px-2 py-1.5 rounded-xl text-[9px] font-black shadow-xl z-20 animate-bounce`}>
+                            {data.volume} CXS • {data.status}
                           </div>
                         )}
-                        <div className={`w-full ${isDark ? 'bg-slate-800' : 'bg-slate-50'} rounded-t-xl relative h-full flex items-end overflow-hidden`}>
-                          <div className={`w-full rounded-t-xl transition-all duration-300 ${barColor} ${isActive ? 'scale-y-[1.02]' : 'opacity-80 group-hover:opacity-100'}`} style={{ height: `${heightPercent}%` }}></div>
+                        <div className={`w-full max-w-[45px] rounded-t-lg transition-all duration-300 ${isSelected ? 'brightness-110 scale-x-110 shadow-lg' : 'opacity-90'} ${data.volume > 1200 ? 'bg-indigo-600' : data.volume > 800 ? 'bg-amber-500' : 'bg-emerald-500'}`} style={{ height: `${h}%` }}>
+                           <div className="w-full h-full bg-white/10 rounded-t-lg"></div>
                         </div>
-                        <span className={`absolute -bottom-8 text-[9px] md:text-xs font-bold uppercase ${isActive ? 'text-indigo-500 scale-110' : theme.textSec} ${i % 2 !== 0 && 'hidden sm:block'} transition-transform`}>{data.time}</span>
+                        <span className={`mt-3 text-[7px] md:text-[10px] font-black uppercase ${isSelected ? 'text-indigo-600' : theme.textSec}`}>{data.time}</span>
                       </div>
                     )
                   })}
                 </div>
-                <div className="mt-10"></div>
               </div>
             </div>
           )}
 
-          {/* =========================================
-              ABA 2: ESTOQUE WMS (MAIS ITENS NA TELA)
-          ============================================= */}
+          {/* ESTOQUE */}
           {activeTab === 'estoque' && (
-            <div className="space-y-6 animate-in fade-in duration-500">
-               <div>
-                  <h2 className={`text-2xl md:text-3xl font-black ${theme.textMain} tracking-tight`}>Estoque WMS</h2>
-                  <p className={`${theme.textSec} font-medium text-sm mt-1`}>Inventário agrupado por cliente B2B. Atualizado em tempo real.</p>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 md:gap-5">
-                {MOCK_INVENTORY.map((item) => (
-                  <button key={item.id} onClick={() => setSelectedProduct(item)} className={`text-left ${theme.card} p-5 md:p-6 rounded-2xl border ${theme.border} ${theme.cardHover} transition-all duration-200 flex flex-col group w-full focus:outline-none`}>
-                    <div className="flex justify-between items-center mb-5 w-full">
-                      <CompanyLogo name={item.client} className="w-12 h-12" />
-                      <span className={`px-2.5 py-1 text-[9px] font-black uppercase tracking-wider rounded-lg ${getStatusColor(item.status)}`}>{item.status}</span>
+            <div className="space-y-6">
+              <h2 className="text-xl md:text-3xl font-black tracking-tight">Estoque WMS</h2>
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5">
+                {MOCK_INVENTORY.map(item => (
+                  <div key={item.id} onClick={() => setSelectedProduct(item)} className={`${theme.card} p-5 rounded-[2rem] border shadow-sm cursor-pointer group active:scale-95 transition-all`}>
+                    <div className="flex justify-between items-center mb-6"><CompanyLogo name={item.client} className="w-8 h-8 md:w-11 md:h-11"/><span className={`px-1.5 py-0.5 text-[7px] md:text-[8px] font-black uppercase rounded-lg ${getStatusColor(item.status)}`}>{item.status}</span></div>
+                    <h4 className="font-black text-[11px] md:text-sm mb-6 group-hover:text-indigo-600 line-clamp-1">{item.name}</h4>
+                    <div className="flex justify-between items-end border-t pt-4 border-slate-50 dark:border-slate-800">
+                      <div><p className="text-[7px] md:text-[8px] font-black uppercase text-slate-400 mb-0.5">Em Stock</p><p className="text-lg md:text-2xl font-black">{item.qty}</p></div>
+                      <ChevronRight className="w-4 h-4 text-slate-300" />
                     </div>
-                    <p className={`text-[10px] md:text-xs font-bold uppercase tracking-widest ${theme.textSec} mb-1`}>{item.sku}</p>
-                    <h3 className={`font-black text-base md:text-lg ${theme.textMain} mb-6 leading-tight flex-1 group-hover:text-indigo-500 transition-colors line-clamp-2`}>{item.name}</h3>
-                    <div className={`pt-4 border-t ${theme.border} flex items-end justify-between w-full`}>
-                      <div>
-                        <p className={`text-[9px] font-bold uppercase ${theme.textSec} mb-0.5`}>Qtd Estoque</p>
-                        <p className={`text-2xl md:text-3xl font-black ${theme.textMain}`}>{item.qty}</p>
-                      </div>
-                      <ChevronRight className={`w-5 h-5 ${theme.textSec} group-hover:text-indigo-500`} />
-                    </div>
-                  </button>
+                  </div>
                 ))}
               </div>
             </div>
           )}
 
-          {/* =========================================
-              ABA 3: RASTREAMENTO (BARRAS CLICÁVEIS E MAIS DADOS)
-          ============================================= */}
+          {/* RASTREIO (COM INFOS DE STATUS E INFRA) */}
           {activeTab === 'rastreamento' && (
-             <div className="w-full space-y-6 animate-in fade-in duration-500">
-                              
-              <div 
-                className="relative w-full rounded-3xl overflow-hidden shadow-lg flex flex-col items-center justify-center p-8 md:p-16 mb-8"
-                style={{
-                  backgroundImage: `url(${TRACKING_BG_URL})`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                }}
-              >
-                <div className="absolute inset-0 bg-slate-950/70 backdrop-blur-[2px]"></div>
-                
-                <div className="relative z-10 flex flex-col items-center text-center w-full max-w-2xl">
-                  <div className="inline-flex items-center justify-center p-4 bg-white/10 backdrop-blur-md rounded-full mb-4 border border-white/20 shadow-xl">
-                    <Search className="w-8 h-8 md:w-10 md:h-10 text-white" />
-                  </div>
-                  <h2 className="text-3xl md:text-5xl font-black text-white tracking-tight mb-2">Buscar Encomenda</h2>
-                  <p className="text-indigo-200 font-bold text-sm md:text-base mb-8">Acompanhe pacotes e veículos em tempo real.</p>
-                  
-                  <form onSubmit={handleTrackingSearch} className="relative w-full">
-                    <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none">
-                      <Package className="w-5 h-5 md:w-6 md:h-6 text-indigo-500" />
-                    </div>
+            <div className="space-y-6">
+               <div className="relative w-full rounded-[2.5rem] overflow-hidden p-8 md:p-16 text-center shadow-lg" style={{ backgroundImage: `url('https://res.cloudinary.com/dnymahpi7/image/upload/v1774112612/Picsart_26-03-21_14-01-59-284_2_pyqjog.jpg')`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
+                <div className="absolute inset-0 bg-slate-950/75 backdrop-blur-[1px]"></div>
+                <div className="relative z-10 max-w-xl mx-auto">
+                  <h2 className="text-3xl md:text-4xl font-black text-white mb-4 tracking-tighter uppercase">Localizador</h2>
+                  <form onSubmit={handleSearch} className="relative">
                     <input 
-                      type="text" placeholder="Ex: SYNC-84920" value={trackingId} onChange={(e) => setTrackingId(e.target.value)}
-                      className="w-full pl-14 pr-32 py-4 md:py-5 rounded-2xl border-0 bg-white/95 backdrop-blur-md text-lg md:text-xl font-black uppercase placeholder:normal-case placeholder:font-bold placeholder:text-slate-400 text-slate-900 transition-all shadow-2xl focus:ring-4 focus:ring-indigo-500/50"
+                      type="text" placeholder="CÓDIGO (EX: SYNC-84920)" value={trackingId} onChange={(e) => setTrackingId(e.target.value)}
+                      className="w-full pl-6 pr-32 py-4 rounded-2xl bg-white text-slate-900 font-black uppercase text-sm md:text-lg shadow-2xl outline-none focus:ring-4 focus:ring-indigo-500/50 transition-all" 
                     />
-                    <button type="submit" disabled={isSearching} className="absolute right-2 top-2 bottom-2 bg-indigo-600 hover:bg-indigo-500 text-white px-6 md:px-8 rounded-xl font-bold text-sm transition-all flex justify-center items-center disabled:opacity-70 shadow-md">
-                      {isSearching ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> : 'Buscar'}
-                    </button>
+                    <button type="submit" className="absolute right-2 top-2 bottom-2 bg-indigo-600 hover:bg-indigo-500 text-white px-6 rounded-xl font-black text-xs uppercase tracking-widest transition-all">Buscar</button>
                   </form>
+                  {searchError && <p className="mt-4 text-red-400 font-bold text-xs uppercase animate-pulse">Código não encontrado.</p>}
                 </div>
               </div>
 
-              {searchError && (
-                <div className="p-4 bg-red-500/10 text-red-500 rounded-xl border border-red-500/20 flex items-center justify-center gap-3 font-bold text-sm animate-in zoom-in-95 shadow-sm max-w-5xl mx-auto">
-                  <AlertTriangle className="w-5 h-5" /> {searchError}
-                </div>
-              )}
-
-              {searchedShipment && (
-                 /* ... Exibição do Rastreio Encontrado ... */
-                <div className={`${theme.card} rounded-3xl border ${theme.border} overflow-hidden animate-in slide-in-from-bottom-4 shadow-xl max-w-4xl mx-auto`}>
-                  <div className="bg-slate-900 text-white p-6 md:p-8 relative overflow-hidden">
-                    <div className="absolute -right-10 -top-10 w-40 h-40 bg-indigo-500 rounded-full blur-[60px] opacity-30"></div>
-                    <div className="relative z-10 flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4">
-                      <div>
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/10 rounded-lg text-[10px] md:text-xs font-black uppercase tracking-widest text-indigo-200 backdrop-blur-md mb-4 border border-white/10">
-                          <Truck className="w-3.5 h-3.5" /> Em Transporte
-                        </span>
-                        <h3 className="text-3xl md:text-4xl font-black tracking-tight">{searchedShipment.id}</h3>
-                        <div className="mt-4 flex items-center gap-3">
-                           <CompanyLogo name={searchedShipment.client} className="w-10 h-10 border-none" />
-                           <span className="text-sm md:text-base font-bold text-white">{searchedShipment.client}</span>
-                        </div>
-                      </div>
-                      <div className="bg-white/10 p-5 rounded-2xl backdrop-blur-md border border-white/10">
-                        <p className="text-[10px] md:text-xs text-slate-300 font-bold uppercase tracking-widest mb-1">Previsão (ETA)</p>
-                        <p className="text-xl md:text-2xl font-black text-emerald-400 flex items-center gap-2"><Clock className="w-5 h-5 md:w-6 md:h-6" /> {searchedShipment.eta}</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="p-6 md:p-8 space-y-8">
-                    <div>
-                      <div className="flex justify-between text-xs md:text-sm font-black text-slate-500 uppercase tracking-wider mb-3">
-                        <span>Origem</span><span className="text-indigo-500">{searchedShipment.progress}%</span><span>Destino</span>
-                      </div>
-                      <div className={`h-3 md:h-4 ${isDark ? 'bg-slate-800' : 'bg-slate-100'} rounded-full overflow-hidden relative shadow-inner`}>
-                        <div className="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-500 to-emerald-400 rounded-full transition-all duration-1000" style={{ width: `${searchedShipment.progress}%` }}></div>
-                      </div>
-                    </div>
-                    
-                    <div className={`flex flex-col sm:flex-row gap-6 pt-8 border-t ${theme.border}`}>
-                      <div className={`flex-1 flex items-center gap-5 ${isDark ? 'bg-slate-800' : 'bg-slate-50'} p-5 rounded-2xl border ${theme.border}`}>
-                        <Avatar name={searchedShipment.driver} className="w-14 h-14" />
-                        <div>
-                           <p className="font-black text-lg text-slate-800 dark:text-white">{searchedShipment.driver}</p>
-                           <p className="text-[10px] md:text-xs font-black text-slate-500 bg-slate-200 dark:bg-slate-700 inline-block px-2 py-1 rounded-md uppercase mt-1">{searchedShipment.plate}</p>
-                        </div>
-                      </div>
-                      <div className="flex-1 space-y-5 sm:pl-6 sm:border-l-2 border-indigo-500/20">
-                         {searchedShipment.events.map((evt, i) => (
-                           <div key={i} className="relative">
-                             <div className="absolute -left-7 top-1 w-2.5 h-2.5 rounded-full bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]"></div>
-                             <p className={`font-black text-sm md:text-base ${i === 0 ? 'text-indigo-500' : theme.textSec}`}>{evt.desc}</p>
-                             <p className={`text-xs font-bold ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>{evt.time}</p>
-                           </div>
-                         ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {!searchedShipment && !isSearching && (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 animate-in fade-in mx-auto">
-                   <div className={`${theme.card} p-6 rounded-3xl border ${theme.border}`}>
-                      <h4 className={`text-xs font-black ${theme.textSec} uppercase tracking-widest mb-5 flex items-center gap-2`}><History className="w-4 h-4"/> Histórico Recente</h4>
-                      <div className="space-y-4">
-                        <div className={`flex items-center justify-between p-4 rounded-xl ${isDark ? 'bg-slate-800' : 'bg-slate-50'} border ${theme.border}`}>
-                           <div className="flex items-center gap-4">
-                             <div className="bg-emerald-500/10 p-2.5 rounded-lg"><CheckCircle2 className="w-5 h-5 text-emerald-500" /></div>
-                             <div><p className={`font-black text-sm ${theme.textMain}`}>SYNC-11203</p><p className="text-[10px] font-bold text-slate-400">Há 2 horas</p></div>
-                           </div>
-                           <span className="text-[9px] font-black text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded uppercase">Entregue</span>
-                        </div>
-                        <div className={`flex items-center justify-between p-4 rounded-xl ${isDark ? 'bg-slate-800' : 'bg-slate-50'} border ${theme.border}`}>
-                           <div className="flex items-center gap-4">
-                             <div className="bg-amber-500/10 p-2.5 rounded-lg"><Truck className="w-5 h-5 text-amber-500" /></div>
-                             <div><p className={`font-black text-sm ${theme.textMain}`}>SYNC-90881</p><p className="text-[10px] font-bold text-slate-400">Há 5 horas</p></div>
-                           </div>
-                           <span className="text-[9px] font-black text-amber-500 bg-amber-500/10 px-2 py-1 rounded uppercase">Em Rota</span>
-                        </div>
-                      </div>
-                   </div>
-                   
-                   <div className={`${theme.card} p-6 rounded-3xl border ${theme.border}`}>
-                      <h4 className={`text-xs font-black ${theme.textSec} uppercase tracking-widest mb-5 flex items-center gap-2`}><Satellite className="w-4 h-4"/> Sistemas de Rastreio (Clicável)</h4>
-                      <div className="space-y-4">
-                        {[
-                          { name: 'API Correios', status: 'Online', color: 'emerald-500', progress: 100, ping: '24ms', uptime: '99.9%' },
-                          { name: 'Satélite Frota Própria', status: 'Online', color: 'emerald-500', progress: 100, ping: '12ms', uptime: '100%' },
-                          { name: 'Integração Transportadoras', status: 'Instável', color: 'red-500', progress: 80, ping: '245ms', uptime: '94.2%', pulse: true },
-                        ].map((sys, idx) => (
-                          <button key={idx} onClick={() => setSelectedSystem(sys)} className={`w-full text-left p-3 -mx-3 rounded-xl transition-all hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-${sys.color}/50 group`}>
-                            <div className="flex justify-between items-center mb-2 px-1">
-                              <span className={`text-[11px] font-bold ${theme.textMain} group-hover:text-indigo-500 flex items-center gap-1.5`}><Activity className="w-3 h-3"/> {sys.name}</span>
-                              <span className={`text-[10px] font-black text-${sys.color} bg-${sys.color}/10 px-2 py-0.5 rounded uppercase`}>{sys.status}</span>
-                            </div>
-                            <div className={`w-full ${isDark ? 'bg-slate-700' : 'bg-slate-200'} rounded-full h-2`}>
-                              <div className={`bg-${sys.color} h-2 rounded-full transition-all duration-500 ${sys.pulse ? 'animate-pulse' : ''}`} style={{ width: `${sys.progress}%` }}></div>
-                            </div>
-                          </button>
-                        ))}
-                      </div>
-                   </div>
-
-                   {/* NOVO CARTÃO PARA PREENCHER O ESPAÇO */}
-                   <div className={`${theme.card} p-6 rounded-3xl border ${theme.border} flex flex-col`}>
-                      <h4 className={`text-xs font-black ${theme.textSec} uppercase tracking-widest mb-5 flex items-center gap-2`}><Server className="w-4 h-4"/> Infraestrutura Cloud</h4>
-                      <div className="space-y-5 flex-1 flex flex-col justify-center">
-                        <div className={`flex items-center justify-between p-3 rounded-lg border ${theme.border} ${isDark ? 'bg-slate-800/50' : 'bg-slate-50'}`}>
-                           <div className="flex items-center gap-3">
-                             <HardDrive className={`w-4 h-4 ${theme.textSec}`}/>
-                             <div><p className={`text-[10px] font-black uppercase ${theme.textMain}`}>AWS - São Paulo (sa-east-1)</p></div>
-                           </div>
-                           <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
-                        </div>
-                        <div className={`flex items-center justify-between p-3 rounded-lg border ${theme.border} ${isDark ? 'bg-slate-800/50' : 'bg-slate-50'}`}>
-                           <div className="flex items-center gap-3">
-                             <HardDrive className={`w-4 h-4 ${theme.textSec}`}/>
-                             <div><p className={`text-[10px] font-black uppercase ${theme.textMain}`}>Google Cloud - SP (sa-east1)</p></div>
-                           </div>
-                           <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
-                        </div>
-                        <div className={`flex items-center justify-between p-3 rounded-lg border ${theme.border} ${isDark ? 'bg-slate-800/50' : 'bg-slate-50'}`}>
-                           <div className="flex items-center gap-3">
-                             <Wifi className={`w-4 h-4 ${theme.textSec}`}/>
-                             <div><p className={`text-[10px] font-black uppercase ${theme.textMain}`}>Banco de Dados Réplica</p></div>
-                           </div>
-                           <span className="text-[9px] font-black text-indigo-500 bg-indigo-500/10 px-2 py-0.5 rounded uppercase">Sincronizado</span>
-                        </div>
-                      </div>
-                   </div>
-
-                </div>
-              )}
-             </div>
-          )}
-
-          {/*
-          =========================================
-              ABA 4: ROTAS (AGORA COM 8 MOTORISTAS)
-          ============================================= */}
-          {activeTab === 'rotas' && (
-            <div className="space-y-6 animate-in fade-in duration-500">
-               <div>
-                  <h2 className={`text-2xl md:text-3xl font-black ${theme.textMain} tracking-tight`}>Monitoramento</h2>
-                  <p className={`${theme.textSec} font-bold text-sm mt-1`}>Telemetria em tempo real de toda a frota espalhada.</p>
-              </div>
-
-              <div className={`relative w-full h-[250px] md:h-[400px] ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-slate-300 border-white'} rounded-3xl overflow-hidden border-[6px] shadow-xl mb-8`}>
-                <iframe 
-                  src="https://www.openstreetmap.org/export/embed.html?bbox=-46.8,-23.7,-46.4,-23.4&layer=mapnik" 
-                  className={`absolute inset-0 w-full h-full pointer-events-none transition-all duration-500 ${isDark ? 'grayscale contrast-125 brightness-50 hue-rotate-180 invert opacity-60' : 'grayscale sepia-[0.1] contrast-125 opacity-80'}`}
-                  style={{ border: 0 }}
-                  title="Mapa Real"
-                />
-                
-                {MOCK_ROUTES.map((route, idx) => {
-                   const positions = [ 
-                     { top: '30%', left: '20%' }, { top: '65%', right: '25%' }, { bottom: '20%', left: '40%' }, { top: '25%', right: '35%' },
-                     { top: '50%', left: '70%' }, { bottom: '35%', right: '10%' }, { top: '15%', left: '50%' }, { bottom: '10%', left: '10%' }
-                   ];
-                   const pos = positions[idx % positions.length];
-                   const isAlert = route.status === 'Atrasado' || route.status === 'Parado';
-
-                   return (
-                     <div key={route.id} onClick={() => setSelectedRoute(route)} className="absolute transform -translate-x-1/2 -translate-y-1/2 group cursor-pointer" style={pos}>
-                        <div className={`absolute inset-0 ${isAlert ? 'bg-red-500' : 'bg-indigo-500'} rounded-full animate-ping opacity-60 scale-[1.7]`}></div>
-                        <Avatar name={route.driver} className={`relative w-10 h-10 md:w-14 md:h-14 border-2 ${isAlert ? 'border-red-500' : 'border-indigo-500'} shadow-xl group-hover:scale-110 transition-transform z-10`} />
+              {searchedShipment ? (
+                <div className={`${theme.card} p-6 md:p-10 rounded-[2.5rem] border shadow-2xl animate-in slide-in-from-bottom-5`}>
+                   <div className="flex justify-between items-center mb-8">
+                     <div className="flex items-center gap-4">
+                       <CompanyLogo name={searchedShipment.client} className="w-14 h-14" />
+                       <div><h3 className="text-2xl font-black tracking-tighter">{searchedShipment.id}</h3><p className={`${theme.textSec} text-xs font-bold uppercase`}>{searchedShipment.client}</p></div>
                      </div>
-                   );
-                })}
-                
-                <div className={`absolute bottom-4 left-4 ${isDark ? 'bg-slate-900/90 text-white border-slate-700' : 'bg-white/90 text-slate-800 border-slate-200'} backdrop-blur-md px-4 py-2 rounded-xl text-xs font-black shadow-lg border flex items-center gap-2`}>
-                   <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span> 8 Veículos Monitorados
+                     <div className="text-right"><p className="text-[10px] font-black text-indigo-500 uppercase mb-1">Previsão</p><p className="text-2xl font-black text-indigo-600">{searchedShipment.eta}</p></div>
+                   </div>
+                   <div className="space-y-4">
+                      <div className="flex justify-between text-[10px] font-black text-slate-400 uppercase"><span>CD Logisync</span><span>{searchedShipment.progress}% Concluído</span><span>Destino</span></div>
+                      <div className="w-full h-3 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden shadow-inner"><div className="h-full bg-gradient-to-r from-indigo-600 to-cyan-500 rounded-full" style={{ width: `${searchedShipment.progress}%` }}></div></div>
+                   </div>
                 </div>
-              </div>
-
-              {/* GRID EXPANDIDO PARA 8 ROTAS */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5">
-                {MOCK_ROUTES.map((route) => (
-                  <button key={route.id} onClick={() => setSelectedRoute(route)} className={`text-left ${theme.card} p-5 md:p-6 rounded-2xl border ${theme.border} ${theme.cardHover} transition-all duration-200 group w-full`}>
-                    <div className="flex justify-between items-start mb-5 w-full">
-                      <div className="flex items-center gap-3">
-                         <Avatar name={route.driver} className="w-12 h-12" />
-                         <div>
-                            <p className={`font-black text-sm md:text-base ${theme.textMain} leading-tight`}>{route.driver}</p>
-                            <p className={`text-[9px] md:text-[10px] font-black ${theme.textSec} ${isDark ? 'bg-slate-800' : 'bg-slate-100'} inline-block px-1.5 py-0.5 rounded uppercase mt-1`}>{route.plate}</p>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                   <div className={`${theme.card} p-6 rounded-[2rem] border shadow-sm`}>
+                      <h4 className="font-black text-sm md:text-lg mb-6 flex items-center gap-2"><Globe className="w-5 h-5 text-indigo-500" /> Status do Sistema</h4>
+                      <div className="space-y-4">
+                         <div className="flex justify-between items-center p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl">
+                            <div className="flex items-center gap-3"><Database className="w-4 h-4 text-slate-400" /><div><p className="text-xs font-black">Banco de Dados</p><p className="text-[10px] text-emerald-500 font-bold uppercase">Sincronizado</p></div></div>
+                            <span className="text-xs font-black text-slate-400">99.9% Uptime</span>
+                         </div>
+                         <div className="flex justify-between items-center p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl">
+                            <div className="flex items-center gap-3"><Cpu className="w-4 h-4 text-slate-400" /><div><p className="text-xs font-black">Telemetria</p><p className="text-[10px] text-emerald-500 font-bold uppercase">Online</p></div></div>
+                            <span className="text-xs font-black text-slate-400">24ms Ping</span>
                          </div>
                       </div>
-                    </div>
-                    <div className="mb-5">
-                      <p className={`text-[9px] md:text-[10px] ${theme.textSec} font-black uppercase tracking-widest mb-1`}><MapPin className="w-3 h-3 inline mr-0.5 text-indigo-500"/> Local Atual</p>
-                      <p className={`text-xs md:text-sm font-bold ${theme.textMain} truncate`}>{route.location}</p>
-                    </div>
-                    <div className={`pt-4 border-t ${theme.border} flex justify-between items-center w-full`}>
-                       <span className={`px-2.5 py-1 text-[9px] md:text-[10px] font-black uppercase tracking-wider rounded-lg ${getStatusColor(route.status)}`}>{route.status}</span>
-                       <ChevronRight className={`w-5 h-5 ${theme.textSec} group-hover:text-indigo-500`} />
-                    </div>
-                  </button>
+                   </div>
+                   <div className={`${theme.card} p-6 rounded-[2rem] border shadow-sm`}>
+                      <h4 className="font-black text-sm md:text-lg mb-6 flex items-center gap-2"><History className="w-5 h-5 text-indigo-500" /> Atividade Recente</h4>
+                      <div className="space-y-3">
+                         <p className="text-[11px] font-medium py-2 border-b border-slate-100 dark:border-slate-800"><span className="text-indigo-500 font-black">[12:45]</span> Rota VTR-08 iniciada para Sto André.</p>
+                         <p className="text-[11px] font-medium py-2 border-b border-slate-100 dark:border-slate-800"><span className="text-indigo-500 font-black">[12:30]</span> Estoque de Americanas (+1200).</p>
+                         <p className="text-[11px] font-medium py-2 border-b border-slate-100 dark:border-slate-800"><span className="text-red-500 font-black">[11:50]</span> Alerta de atraso para unidade VTR-02.</p>
+                      </div>
+                   </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ROTAS (MAPA COM MOTORISTAS RESTAURADOS) */}
+          {activeTab === 'rotas' && (
+            <div className="space-y-6">
+              <h2 className="text-xl md:text-3xl font-black tracking-tight">Monitorização Global</h2>
+              
+              <div className="w-full h-64 md:h-[450px] rounded-[2.5rem] overflow-hidden border-4 border-white dark:border-slate-800 shadow-xl relative bg-slate-200">
+                <iframe 
+                  src="https://www.openstreetmap.org/export/embed.html?bbox=-46.8,-23.7,-46.4,-23.4&layer=mapnik" 
+                  className={`absolute inset-0 w-full h-full grayscale contrast-125 ${isDark ? 'invert brightness-50' : ''}`}
+                  style={{ border: 0 }}
+                  title="Mapa Logisync"
+                />
+                
+                {/* MOTORISTAS NO MAPA */}
+                {MOCK_ROUTES.map((r, i) => (
+                  <div key={i} className="absolute transform -translate-x-1/2 -translate-y-1/2 cursor-pointer z-10 transition-transform hover:scale-125" style={{ top: r.pos.t, left: r.pos.l }} onClick={() => setSelectedRoute(r)}>
+                    <div className={`absolute -inset-2 rounded-full animate-ping opacity-40 ${r.status === 'Atrasado' ? 'bg-red-500' : 'bg-indigo-500'}`}></div>
+                    <Avatar name={r.driver} className={`w-8 h-8 md:w-12 md:h-12 border-2 ${r.status === 'Atrasado' ? 'border-red-500' : 'border-indigo-500'} shadow-2xl relative z-20`} />
+                  </div>
+                ))}
+
+                <div className="absolute bottom-4 left-4 bg-white/95 dark:bg-slate-900/95 px-4 py-2 rounded-2xl text-[9px] md:text-[11px] font-black shadow-lg border dark:border-slate-700 flex items-center gap-2">
+                   <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> 8 Veículos Monitorados
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5">
+                {MOCK_ROUTES.map(route => (
+                  <div key={route.id} onClick={() => setSelectedRoute(route)} className={`${theme.card} p-5 rounded-[1.5rem] border shadow-sm cursor-pointer group active:scale-95 transition-all`}>
+                    <div className="flex items-center gap-3 mb-5 md:mb-6"><Avatar name={route.driver} className="w-9 h-9 md:w-11 md:h-11" /><div className="font-black text-sm group-hover:text-indigo-600 transition-colors">{route.driver}</div></div>
+                    <div className="mb-5"><p className="text-[8px] font-black text-slate-400 uppercase mb-1">Última Paragem</p><p className="text-[11px] font-bold truncate leading-relaxed">{route.dest}</p></div>
+                    <div className="flex justify-between items-center pt-4 border-t border-slate-50 dark:border-slate-800"><span className={`px-2 py-0.5 text-[8px] font-black uppercase rounded-lg ${getStatusColor(route.status)}`}>{route.status}</span><ChevronRight className="w-4 h-4 text-slate-300" /></div>
+                  </div>
                 ))}
               </div>
             </div>
@@ -667,338 +386,113 @@ export default function App() {
       </main>
 
       {/* =====================================================================
-          MODAIS E POPUPS (AGORA COM O MODAL DE SISTEMA)
+          4. MODAIS E DETALHES FUNCIONAIS (AQUI ESTÁ A GESTÃO DE OCORRÊNCIAS)
       ===================================================================== */}
-      
-      {/* 0. NOVO MODAL: Detalhes do Sistema de Rastreio */}
-      {selectedSystem && (
-         <Modal title="Diagnóstico de Rede" onClose={() => setSelectedSystem(null)}>
-           <div className="space-y-5">
-             <div className={`${theme.modalContentBg} border ${theme.border} p-6 rounded-3xl flex items-center gap-5 shadow-sm`}>
-               <div className={`p-4 rounded-2xl bg-${selectedSystem.color}/10`}>
-                 <Server className={`w-10 h-10 text-${selectedSystem.color}`} />
+
+      {/* MODAL KPIs DASHBOARD - GESTÃO DE OCORRÊNCIAS */}
+      {activeModal === 'problemas' && (
+        <Modal title="Gestão de Ocorrências em Campo" onClose={() => setActiveModal(null)}>
+           <div className="space-y-4">
+             {MOCK_PROBLEMS.map((prob, i) => (
+               <div key={i} className={`p-5 rounded-3xl border-2 ${prob.severity === 'Crítico' ? 'bg-red-500/5 border-red-500/20' : 'bg-amber-500/5 border-amber-500/20'} flex flex-col gap-4 shadow-sm`}>
+                  <div className="flex justify-between items-start">
+                    <div className="flex items-center gap-4">
+                       <div className={`p-3 rounded-2xl ${prob.severity === 'Crítico' ? 'bg-red-500 text-white' : 'bg-amber-500 text-white shadow-amber-500/20'}`}>
+                          {prob.severity === 'Crítico' ? <AlertTriangle className="w-6 h-6" /> : <ShieldAlert className="w-6 h-6" />}
+                       </div>
+                       <div>
+                          <h4 className={`font-black text-lg ${prob.severity === 'Crítico' ? 'text-red-500' : 'text-amber-600'}`}>{prob.type}</h4>
+                          <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">{prob.id} • {prob.time}</p>
+                       </div>
+                    </div>
+                    <span className={`px-2 py-1 rounded text-[9px] font-black uppercase ${prob.severity === 'Crítico' ? 'bg-red-500 text-white' : 'bg-amber-500 text-white'}`}>{prob.severity}</span>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-3 py-4 border-y border-slate-100 dark:border-slate-800">
+                     <div className="flex items-center gap-3"><Avatar name={prob.driver} className="w-8 h-8" /><div><p className="text-[10px] text-slate-400 font-black uppercase">Motorista</p><p className="text-xs font-black">{prob.driver}</p></div></div>
+                     <div><p className="text-[10px] text-slate-400 font-black uppercase">Localização</p><p className="text-xs font-black truncate">{prob.loc}</p></div>
+                  </div>
+
+                  <p className="text-xs font-medium text-slate-500 leading-relaxed italic">"{prob.desc}"</p>
+
+                  <div className="flex gap-3 mt-2">
+                     <button className="flex-1 py-3 bg-indigo-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest active:scale-95 transition-all shadow-lg shadow-indigo-500/20">Tratar Agora</button>
+                     <button className="flex-1 py-3 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 rounded-xl font-black text-[10px] uppercase tracking-widest active:scale-95 transition-all">Ligar</button>
+                  </div>
                </div>
-               <div>
-                 <p className={`text-[10px] font-black uppercase tracking-widest ${theme.textSec}`}>Serviço Conectado</p>
-                 <h3 className={`font-black text-2xl ${theme.textMain} mb-1`}>{selectedSystem.name}</h3>
-                 <span className={`inline-block px-2.5 py-1 text-[10px] font-black uppercase rounded-lg text-${selectedSystem.color} bg-${selectedSystem.color}/10 border border-${selectedSystem.color}/20`}>Status: {selectedSystem.status}</span>
-               </div>
-             </div>
-             <div className="grid grid-cols-2 gap-4">
-               <div className={`${theme.modalContentBg} border ${theme.border} p-5 rounded-2xl text-center`}>
-                  <Activity className="w-6 h-6 text-indigo-500 mx-auto mb-2 opacity-50"/>
-                  <p className={`text-[10px] font-black uppercase ${theme.textSec} tracking-widest`}>Latência (Ping)</p>
-                  <p className={`text-3xl font-black ${theme.textMain}`}>{selectedSystem.ping}</p>
-               </div>
-               <div className={`${theme.modalContentBg} border ${theme.border} p-5 rounded-2xl text-center`}>
-                  <ShieldAlert className="w-6 h-6 text-indigo-500 mx-auto mb-2 opacity-50"/>
-                  <p className={`text-[10px] font-black uppercase ${theme.textSec} tracking-widest`}>Uptime (30 dias)</p>
-                  <p className={`text-3xl font-black ${theme.textMain}`}>{selectedSystem.uptime}</p>
-               </div>
-             </div>
-             <div className={`${theme.modalContentBg} border ${theme.border} p-5 rounded-2xl`}>
-               <p className={`text-xs font-black uppercase tracking-widest ${theme.textMain} mb-3 flex items-center gap-2`}><History className="w-4 h-4"/> Log de Eventos</p>
-               <div className={`text-xs ${theme.textSec} space-y-3 font-mono bg-slate-950 text-emerald-400 p-4 rounded-xl`}>
-                 <p>&gt; [{new Date().toLocaleTimeString()}] Handshake SSL estabelecido.</p>
-                 <p>&gt; [{new Date(Date.now() - 30000).toLocaleTimeString()}] Resposta OK. Ping: {selectedSystem.ping}.</p>
-                 <p>&gt; [{new Date(Date.now() - 120000).toLocaleTimeString()}] Sincronizando lotes pendentes [BATCH-992]...</p>
-                 {selectedSystem.status === 'Instável' && (
-                   <p className="text-red-400">&gt; AVISO: Perda de pacotes detectada na porta 443.</p>
-                 )}
-               </div>
-             </div>
+             ))}
            </div>
-         </Modal>
+        </Modal>
       )}
 
-      {/* 1. Modal Estoque (Produto) */}
+      {/* MODAL ENTREGAS */}
+      {activeModal === 'entregas' && (
+        <Modal title="Histórico de Entregas (Hoje)" onClose={() => setActiveModal(null)}>
+           <div className="space-y-4">
+             {[{id: '#ENT-01', c: 'Apple', t: '11:45', d: 'Shopping Morumbi'}, {id: '#ENT-02', c: 'Amazon', t: '11:20', d: 'Centro Barueri'}, {id: '#ENT-03', c: 'Shopee', t: '10:55', d: 'Vila Olímpia'}].map((e, i) => (
+               <div key={i} className="flex justify-between items-center p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl border dark:border-slate-700 shadow-sm">
+                  <div className="flex gap-4 items-center"><CompanyLogo name={e.c} className="w-10 h-10" /><div><p className="font-black text-sm">{e.id}</p><p className="text-[10px] text-slate-400 font-bold">{e.d}</p></div></div>
+                  <div className="text-right"><p className="font-black text-sm">{e.t}</p><span className="text-[8px] font-black text-emerald-500 uppercase bg-emerald-500/10 px-2 py-1 rounded">Concluída</span></div>
+               </div>
+             ))}
+           </div>
+        </Modal>
+      )}
+
+      {/* MODAL SLA */}
+      {activeModal === 'sla' && (
+        <Modal title="Performance Platinum" onClose={() => setActiveModal(null)}>
+           <div className="flex flex-col items-center py-10">
+             <div className="relative w-56 h-56 rounded-full border-[18px] border-emerald-500 flex items-center justify-center shadow-2xl mb-8 animate-in zoom-in-75 duration-700">
+                <div className="text-center"><span className="text-5xl font-black text-indigo-600 tracking-tighter">98,05%</span><p className="text-emerald-500 font-black text-[10px] uppercase mt-2 tracking-[0.2em]">Eficiência Operacional</p></div>
+             </div>
+             <p className="text-center text-sm text-slate-400 max-w-xs font-medium leading-relaxed">Sua operação mantém um desvio de apenas 1,95%, consolidando o LOGISYNC como líder em precisão logística.</p>
+           </div>
+        </Modal>
+      )}
+
+      {/* MODAL PRODUTO WMS */}
       {selectedProduct && (
         <Modal title="Info do WMS" onClose={() => setSelectedProduct(null)}>
-          <div className="flex flex-col md:flex-row gap-5">
-            <div className="flex-1 bg-slate-900 text-white p-6 rounded-2xl shadow-xl relative overflow-hidden flex flex-col">
-              <CompanyLogo name={selectedProduct.client} className="w-14 h-14 mb-4 border-none shadow-none" />
-              <p className="text-[10px] font-bold text-indigo-300 uppercase tracking-widest mb-1">Dono B2B</p>
-              <h4 className="text-2xl font-black mb-6">{selectedProduct.client}</h4>
-              <div className="bg-white/10 backdrop-blur-md p-4 rounded-xl mt-auto">
-                <p className="text-[9px] font-bold text-slate-300 uppercase tracking-widest mb-1">SKU</p>
-                <p className="text-base font-mono">{selectedProduct.sku}</p>
-              </div>
+          <div className="space-y-6">
+            <div className="flex items-center gap-5 bg-slate-950 p-6 rounded-[1.5rem] text-white shadow-2xl">
+              <CompanyLogo name={selectedProduct.client} className="w-14 h-14" />
+              <div><h4 className="text-xl font-black leading-tight">{selectedProduct.name}</h4><p className="text-[10px] font-mono opacity-50 tracking-widest">{selectedProduct.sku}</p></div>
             </div>
-
-            <div className="flex-1 space-y-4">
-              <div>
-                <h2 className={`text-lg font-black ${theme.textMain} leading-tight mb-2`}>{selectedProduct.name}</h2>
-                <span className={`inline-block px-2.5 py-1 text-[9px] font-black uppercase rounded-md ${getStatusColor(selectedProduct.status)}`}>Estoque: {selectedProduct.status}</span>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div className={`${theme.modalContentBg} p-4 rounded-xl text-center border ${theme.border}`}>
-                  <MapPinned className="w-5 h-5 text-indigo-500 mx-auto mb-1" />
-                  <p className={`text-[9px] font-bold uppercase ${theme.textSec} mb-0.5`}>Corredor</p>
-                  <p className={`text-xl font-black ${theme.textMain}`}>{selectedProduct.corredor}</p>
-                </div>
-                <div className={`${theme.modalContentBg} p-4 rounded-xl text-center border ${theme.border}`}>
-                  <Box className="w-5 h-5 text-indigo-500 mx-auto mb-1" />
-                  <p className={`text-[9px] font-bold uppercase ${theme.textSec} mb-0.5`}>Prateleira</p>
-                  <p className={`text-xl font-black ${theme.textMain}`}>{selectedProduct.prateleira}</p>
-                </div>
-              </div>
-              <div className={`${isDark ? 'bg-indigo-900/20 border-indigo-500/20' : 'bg-indigo-50 border-indigo-100'} p-5 rounded-xl border flex items-center justify-between`}>
-                <div>
-                  <p className="text-[10px] font-bold uppercase text-indigo-400 mb-0.5">Volume Total</p>
-                  <p className="text-2xl font-black text-indigo-600 dark:text-indigo-400">{selectedProduct.qty}</p>
-                </div>
-                <QrCode className="w-10 h-10 text-indigo-300" />
-              </div>
+            <div className="grid grid-cols-2 gap-4 text-center">
+              <div className="p-6 bg-slate-50 dark:bg-slate-800 rounded-3xl border dark:border-slate-700 shadow-inner"><p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Volume em Rack</p><p className="text-4xl font-black text-indigo-600">{selectedProduct.qty}</p></div>
+              <div className="p-6 bg-slate-50 dark:bg-slate-800 rounded-3xl border dark:border-slate-700 shadow-inner"><p className="text-[10px] font-black text-slate-400 uppercase mb-2">Status Logístico</p><p className={`text-[10px] font-black uppercase px-3 py-1.5 rounded-xl ${getStatusColor(selectedProduct.status)}`}>{selectedProduct.status}</p></div>
             </div>
           </div>
         </Modal>
       )}
 
-      {/* 2. Modal Entregas KPI */}
-      {activeModal === 'entregas' && (
-        <Modal title="Últimas Entregas" onClose={() => setActiveModal(null)}>
-          <div className="space-y-3">
-            {DETAILS_MOCK.entregas.map((item, i) => (
-              <button key={i} onClick={() => { setActiveModal(null); setSelectedDelivery(item); }} className={`w-full text-left ${theme.modalContentBg} p-4 rounded-2xl border ${theme.border} flex items-center justify-between hover:shadow-md transition-all`}>
-                <div className="flex items-center gap-4">
-                  <CompanyLogo name={item.client} className="w-10 h-10" />
-                  <div>
-                    <p className={`font-black text-base ${theme.textMain}`}>{item.id}</p>
-                    <p className={`text-xs font-bold ${theme.textSec}`}>{item.dest}</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className={`text-lg font-black ${theme.textMain}`}>{item.time}</p>
-                  <span className="text-[9px] font-black uppercase text-emerald-600 bg-emerald-500/10 px-2 py-1 rounded mt-1 inline-block border border-emerald-500/20">Concluída</span>
-                </div>
-              </button>
-            ))}
-          </div>
-        </Modal>
-      )}
-
-      {/* 3. Modal Comprovante */}
-      {selectedDelivery && (
-        <Modal title="Comprovante" onClose={() => setSelectedDelivery(null)}>
-          <div className={`max-w-sm mx-auto ${theme.modalContentBg} border ${theme.border} rounded-3xl p-6 shadow-xl relative`}>
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-emerald-500 text-white p-3 rounded-full border-4 border-white dark:border-slate-800">
-              <Check className="w-6 h-6" strokeWidth={4} />
-            </div>
-            <div className={`text-center mt-6 mb-6 border-b-2 border-dashed ${isDark ? 'border-slate-700' : 'border-slate-200'} pb-6`}>
-              <p className={`text-[10px] font-black ${theme.textSec} uppercase mb-1`}>ID do Pedido</p>
-              <p className={`text-2xl font-black ${theme.textMain}`}>{selectedDelivery.id}</p>
-              <p className="text-emerald-500 font-bold text-xs mt-2 flex items-center justify-center gap-1"><Clock className="w-3 h-3"/> Entregue às {selectedDelivery.time}</p>
-            </div>
-            <div className="space-y-5">
-              <div>
-                <p className={`text-[10px] font-black ${theme.textSec} uppercase mb-1`}>Destino</p>
-                <p className={`text-sm font-bold ${theme.textMain}`}>{selectedDelivery.dest}</p>
-              </div>
-              <div className={`flex items-center gap-4 ${isDark ? 'bg-slate-800' : 'bg-slate-50'} p-3 rounded-xl`}>
-                <Avatar name={selectedDelivery.driver} className="w-10 h-10" />
-                <div>
-                  <p className={`text-[10px] font-black ${theme.textSec} uppercase mb-0.5`}>Motorista</p>
-                  <p className={`text-sm font-black ${theme.textMain}`}>{selectedDelivery.driver}</p>
-                </div>
-              </div>
-              <div className={`${isDark ? 'bg-indigo-900/20 border-indigo-500/20' : 'bg-indigo-50 border-indigo-100'} p-4 rounded-xl border`}>
-                <p className={`text-[10px] font-black text-indigo-400 uppercase mb-2`}>Assinatura</p>
-                <p className={`text-lg font-serif italic ${isDark ? 'text-slate-300' : 'text-slate-700'} border-b ${isDark ? 'border-slate-600' : 'border-indigo-200'} inline-block pb-1`}>{selectedDelivery.sign}</p>
-              </div>
-            </div>
-          </div>
-        </Modal>
-      )}
-
-      {/* 4. Modal Controle de VTR */}
+      {/* MODAL ROTA/MOTORISTA */}
       {selectedRoute && (
-        <Modal title="Controle de Frota" onClose={() => setSelectedRoute(null)}>
-          <div className="flex flex-col gap-4">
-             <div className={`flex items-center gap-4 ${theme.modalContentBg} border ${theme.border} p-4 rounded-2xl`}>
-                <Avatar name={selectedRoute.driver} className="w-16 h-16" />
-                <div>
-                  <p className={`text-xl font-black ${theme.textMain} mb-1`}>{selectedRoute.driver}</p>
-                  <div className="flex gap-2">
-                     <span className={`bg-slate-500/10 px-2 py-1 rounded text-xs font-black uppercase ${theme.textSec}`}>{selectedRoute.plate}</span>
-                     <span className={`bg-slate-500/10 px-2 py-1 rounded text-xs font-black ${theme.textSec} flex items-center gap-1`}><Phone className="w-3 h-3"/> {selectedRoute.phone}</span>
-                  </div>
-                </div>
-             </div>
-
-             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                <div className={`${theme.modalContentBg} border ${theme.border} p-3 rounded-xl text-center`}>
-                  <Activity className="w-5 h-5 text-indigo-500 mx-auto mb-1"/>
-                  <p className={`text-[10px] uppercase font-bold ${theme.textSec}`}>Velocidade</p>
-                  <p className={`text-lg font-black ${theme.textMain}`}>{selectedRoute.speed}</p>
-                </div>
-                <div className={`${theme.modalContentBg} border ${theme.border} p-3 rounded-xl text-center`}>
-                  <Thermometer className="w-5 h-5 text-amber-500 mx-auto mb-1"/>
-                  <p className={`text-[10px] uppercase font-bold ${theme.textSec}`}>Temp</p>
-                  <p className={`text-lg font-black ${theme.textMain}`}>{selectedRoute.temp}</p>
-                </div>
-                <div className={`${theme.modalContentBg} border ${theme.border} p-3 rounded-xl text-center`}>
-                  <Clock className="w-5 h-5 text-emerald-500 mx-auto mb-1"/>
-                  <p className={`text-[10px] uppercase font-bold ${theme.textSec}`}>ETA</p>
-                  <p className={`text-lg font-black ${theme.textMain}`}>{selectedRoute.eta}</p>
-                </div>
-                <div className={`${theme.modalContentBg} border ${theme.border} p-3 rounded-xl text-center`}>
-                  <BatteryCharging className="w-5 h-5 text-emerald-500 mx-auto mb-1"/>
-                  <p className={`text-[10px] uppercase font-bold ${theme.textSec}`}>Bateria</p>
-                  <p className={`text-lg font-black ${theme.textMain}`}>98%</p>
-                </div>
-             </div>
-
-             <h4 className={`font-black text-sm ${theme.textMain} mt-4 mb-2`}>Carga Atual</h4>
-             {selectedRoute.cargo.length > 0 ? (
-               <div className="space-y-3">
-                 {selectedRoute.cargo.map((item, idx) => (
-                   <div key={idx} className={`${theme.modalContentBg} border ${theme.border} p-4 rounded-xl flex items-center justify-between`}>
-                      <div className="flex items-center gap-3">
-                        <CompanyLogo name={item.client} className="w-8 h-8" />
-                        <div>
-                          <p className={`font-bold text-sm ${theme.textMain}`}>{item.item}</p>
-                          <p className={`text-[10px] font-bold ${theme.textSec}`}>{item.client}</p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className={`text-lg font-black text-indigo-500`}>{item.qty} un</p>
-                      </div>
-                   </div>
-                 ))}
-               </div>
-             ) : (
-                <div className={`${theme.modalContentBg} border ${theme.border} p-6 rounded-xl text-center flex flex-col items-center`}>
-                  <Box className={`w-8 h-8 ${theme.textSec} mb-2 opacity-50`} />
-                  <p className={`font-bold text-sm ${theme.textMain}`}>Veículo Vazio</p>
-                  <p className={`text-[10px] ${theme.textSec}`}>Retornando ao CD.</p>
-                </div>
-             )}
-          </div>
-        </Modal>
-      )}
-      
-      {/* 5. Modal Trânsito KPI */}
-      {activeModal === 'transito' && (
-        <Modal title="Frota em Rota" onClose={() => setActiveModal(null)}>
-          <div className="space-y-4">
-            {DETAILS_MOCK.transito.map((item, i) => (
-              <button key={i} onClick={() => { setActiveModal(null); setSelectedRoute(item); }} className={`w-full text-left ${theme.modalContentBg} p-4 rounded-xl border ${theme.border} hover:shadow-md transition-all`}>
-                <div className="flex justify-between items-center mb-3">
-                  <div className="flex items-center gap-3">
-                    <Avatar name={item.driver} className="w-10 h-10" />
-                    <div>
-                      <p className={`font-black text-sm ${theme.textMain}`}>{item.driver}</p>
-                      <p className={`text-[10px] font-bold ${theme.textSec}`}>{item.id}</p>
-                    </div>
-                  </div>
-                  <span className={`px-2 py-1 text-[9px] font-black uppercase rounded ${getStatusColor(item.status)}`}>{item.status}</span>
-                </div>
-                <p className={`text-xs font-bold ${theme.textSec} truncate mb-1`}><MapPin className="w-3 h-3 inline mr-1"/> {item.location}</p>
-              </button>
-            ))}
+        <Modal title="Painel da Unidade" onClose={() => setSelectedRoute(null)}>
+          <div className="space-y-8 text-center">
+            <Avatar name={selectedRoute.driver} className="w-24 h-24 mx-auto border-4 border-indigo-500/30 shadow-2xl" />
+            <div><h4 className="text-3xl font-black tracking-tighter">{selectedRoute.driver}</h4><p className="text-sm font-black text-indigo-500 uppercase tracking-widest">{selectedRoute.plate}</p></div>
+            <div className="grid grid-cols-2 gap-3">
+               <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl text-center border dark:border-slate-800 shadow-sm"><Activity className="w-5 h-5 mx-auto mb-2 text-indigo-500"/><p className="text-[8px] font-black text-slate-400 uppercase">GPS SINAL</p><p className="text-xs font-black">EXCELENTE</p></div>
+               <div className="p-4 bg-white dark:bg-slate-900 rounded-2xl text-center border dark:border-slate-800 shadow-sm"><Phone className="w-5 h-5 mx-auto mb-2 text-emerald-500"/><p className="text-[8px] font-black text-slate-400 uppercase">CANAL</p><p className="text-xs font-black">ATIVO</p></div>
+            </div>
+            <button className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl">Contactar Motorista</button>
           </div>
         </Modal>
       )}
 
-      {/* 6. Modal Problemas (Abre a Lista) */}
-      {activeModal === 'problemas' && (
-        <Modal title="Ocorrências em Campo" onClose={() => setActiveModal(null)}>
-          <div className="space-y-4">
-            {DETAILS_MOCK.problemas.map((item, i) => (
-              <button 
-                key={i} 
-                onClick={() => { setActiveModal(null); setSelectedProblem(item); }} 
-                className={`w-full text-left ${theme.modalContentBg} p-5 rounded-2xl border-2 ${item.severity === 'Crítico' ? 'border-red-500/30 hover:border-red-500/60' : 'border-amber-500/30 hover:border-amber-500/60'} flex flex-col sm:flex-row justify-between gap-4 transition-colors group`}
-              >
-                <div className="flex items-center gap-4">
-                  <div className={`p-3 rounded-xl ${item.severity === 'Crítico' ? 'bg-red-100 text-red-600' : 'bg-amber-100 text-amber-600'} group-hover:scale-110 transition-transform`}>
-                    <AlertTriangle className="w-6 h-6"/>
-                  </div>
-                  <div>
-                    <p className={`font-black text-lg ${theme.textMain} leading-tight`}>{item.type}</p>
-                    <p className={`text-[10px] font-bold ${theme.textSec} mt-1`}><Clock className="w-3 h-3 inline mr-1" />Reportado às {item.time}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 bg-indigo-600 text-white text-xs font-black px-4 py-2 rounded-xl group-hover:bg-indigo-500 transition-colors self-start sm:self-center">
-                  Tratar <ChevronRight className="w-4 h-4"/>
-                </div>
-              </button>
-            ))}
-          </div>
-        </Modal>
-      )}
-
-      {/* 7. Modal Tratativa de Ocorrência */}
-      {selectedProblem && (
-        <Modal title="Resolução de Ocorrência" onClose={() => setSelectedProblem(null)}>
-          <div className="flex flex-col gap-6">
-            <div className={`${selectedProblem.severity === 'Crítico' ? 'bg-red-500' : 'bg-amber-500'} p-6 rounded-3xl text-white shadow-lg relative overflow-hidden`}>
-              <AlertTriangle className="absolute -right-4 -top-4 w-32 h-32 opacity-20" />
-              <p className="text-[10px] font-black uppercase tracking-widest mb-1 opacity-80">Natureza do Problema</p>
-              <h2 className="text-3xl font-black mb-2">{selectedProblem.type}</h2>
-              <div className="flex items-center gap-3">
-                <span className="bg-white/20 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest">{selectedProblem.severity}</span>
-                <span className="text-sm font-bold flex items-center gap-1"><Clock className="w-4 h-4"/> {selectedProblem.time}</span>
-              </div>
+      {/* NAV MOBILE */}
+      <nav className={`md:hidden fixed bottom-0 left-0 right-0 ${theme.nav} border-t border-slate-100 dark:border-slate-800 pb-safe pt-2.5 px-6 flex justify-around z-50 shadow-[0_-10px_30px_rgba(0,0,0,0.1)]`}>
+        {NAV_ITEMS.map(item => (
+          <button key={item.id} onClick={() => {setActiveTab(item.id); window.scrollTo(0,0);}} className="flex flex-col items-center p-2 group transition-all">
+            <div className={`p-2 rounded-xl transition-all duration-300 ${activeTab === item.id ? 'bg-indigo-600 text-white scale-110 shadow-lg shadow-indigo-500/30' : 'text-slate-400 group-active:scale-90'}`}>
+              <item.icon className="w-6 h-6" strokeWidth={activeTab === item.id ? 2.5 : 2} />
             </div>
-
-            <div className={`${theme.modalContentBg} border ${theme.border} p-5 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4`}>
-               <div className="flex items-center gap-4">
-                  <Avatar name={selectedProblem.driver} className="w-14 h-14" />
-                  <div>
-                    <p className={`text-[10px] font-black ${theme.textSec} uppercase tracking-widest`}>Motorista no Local</p>
-                    <p className={`text-xl font-black ${theme.textMain} mb-0.5`}>{selectedProblem.driver}</p>
-                    <p className={`text-xs font-bold ${theme.textSec} flex items-center gap-1`}><Truck className="w-3 h-3"/> VTR: {selectedProblem.route} ({selectedProblem.plate})</p>
-                  </div>
-               </div>
-               <button className="bg-green-500 hover:bg-green-600 text-white px-5 py-3 rounded-xl text-sm font-black flex items-center justify-center gap-2 transition-colors shadow-md">
-                 <Phone className="w-4 h-4"/> Ligar: {selectedProblem.phone}
-               </button>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-               <div className={`${theme.modalContentBg} border ${theme.border} p-5 rounded-2xl`}>
-                 <h4 className={`text-[10px] font-black ${theme.textSec} uppercase tracking-widest mb-2 flex items-center gap-1.5`}><MapPin className="w-4 h-4 text-indigo-500"/> Local do Fato</h4>
-                 <p className={`text-sm font-bold ${theme.textMain}`}>{selectedProblem.location}</p>
-               </div>
-               <div className={`${theme.modalContentBg} border ${theme.border} p-5 rounded-2xl`}>
-                 <h4 className={`text-[10px] font-black ${theme.textSec} uppercase tracking-widest mb-2 flex items-center gap-1.5`}><MessageSquareWarning className="w-4 h-4 text-amber-500"/> Relato do Motorista</h4>
-                 <p className={`text-sm font-medium ${theme.textSec}`}>{selectedProblem.desc}</p>
-               </div>
-            </div>
-
-            <div>
-               <h4 className={`text-xs font-black ${theme.textMain} mb-3`}>Ações de Resolução</h4>
-               <div className="flex flex-wrap gap-3">
-                  {selectedProblem.severity === 'Crítico' ? (
-                    <>
-                      <button className="bg-indigo-600 text-white px-4 py-2.5 rounded-xl text-xs font-black flex items-center gap-2 hover:bg-indigo-500"><Wrench className="w-4 h-4"/> Acionar Guincho/Seguro</button>
-                      <button className={`${isDark ? 'bg-slate-800 text-white' : 'bg-slate-200 text-slate-800'} px-4 py-2.5 rounded-xl text-xs font-black flex items-center gap-2 hover:opacity-80`}><Truck className="w-4 h-4"/> Enviar Veículo de Apoio</button>
-                    </>
-                  ) : (
-                    <>
-                      <button className="bg-indigo-600 text-white px-4 py-2.5 rounded-xl text-xs font-black flex items-center gap-2 hover:bg-indigo-500"><CalendarClock className="w-4 h-4"/> Reagendar Entrega</button>
-                      <button className={`${isDark ? 'bg-slate-800 text-white' : 'bg-slate-200 text-slate-800'} px-4 py-2.5 rounded-xl text-xs font-black flex items-center gap-2 hover:opacity-80`}><Phone className="w-4 h-4"/> Contatar Cliente</button>
-                    </>
-                  )}
-                  <button className="bg-emerald-100 text-emerald-700 px-4 py-2.5 rounded-xl text-xs font-black flex items-center gap-2 hover:bg-emerald-200 ml-auto border border-emerald-200"><CheckCircle2 className="w-4 h-4"/> Marcar como Resolvido</button>
-               </div>
-            </div>
-          </Modal>
-      )}
-      
-      {/* 8. Modal SLA KPI */}
-      {activeModal === 'sla' && (
-        <Modal title="Desempenho SLA" onClose={() => setActiveModal(null)}>
-          <div className="flex flex-col items-center justify-center py-8">
-            <div className="relative w-48 h-48 rounded-full border-[16px] border-emerald-500 flex items-center justify-center shadow-inner mb-6">
-              <span className={`text-4xl font-black ${theme.textMain}`}>98.5%</span>
-            </div>
-            <h4 className={`text-xl font-black ${theme.textMain}`}>Padrão Ouro</h4>
-            <p className={`text-xs ${theme.textSec} mt-2 text-center max-w-xs font-medium`}>Sua operação fluiu perfeitamente na última hora. Apenas 1.5% das rotas tiveram desvio de percurso.</p>
-          </div>
-        </Modal>
-      )}
+            <span className={`text-[8px] md:text-[9px] mt-1.5 font-black uppercase tracking-widest transition-all ${activeTab === item.id ? 'text-indigo-600 opacity-100' : 'text-slate-400 opacity-60'}`}>{item.label}</span>
+          </button>
+        ))}
+      </nav>
 
     </div>
   );

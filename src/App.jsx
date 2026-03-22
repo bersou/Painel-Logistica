@@ -1,15 +1,12 @@
 import React, { useState } from 'react';
 import { 
-  Hexagon, 
-  Package, Truck, MapPin, Search, 
-  CheckCircle2, AlertTriangle, Box, 
-  Activity, X, Map as MapIcon, 
-  Navigation, Phone, Clock, ShieldAlert, 
-  Check, ChevronRight, TrendingUp, 
-  Thermometer, BatteryCharging, 
-  FileText, QrCode, MapPinned,
+  Hexagon, Package, Truck, MapPin, Search, 
+  CheckCircle2, AlertTriangle, Box, Activity, 
+  X, Map as MapIcon, Navigation, Phone, Clock, 
+  ShieldAlert, Check, ChevronRight, TrendingUp, 
+  Thermometer, BatteryCharging, QrCode, MapPinned,
   Satellite, Server, History, MessageSquareWarning,
-  Wrench, CalendarClock
+  Wrench, CalendarClock, HardDrive, Wifi
 } from 'lucide-react';
 
 // --- ESTILOS INJETADOS ---
@@ -51,7 +48,10 @@ const USER_PHOTOS = {
   'João Pedro': 'https://randomuser.me/api/portraits/men/32.jpg',
   'Marcos Silva': 'https://randomuser.me/api/portraits/men/44.jpg',
   'Carla Dias': 'https://randomuser.me/api/portraits/women/68.jpg',
-  'Roberto Justos': 'https://randomuser.me/api/portraits/men/85.jpg',
+  'Ana Souza': 'https://randomuser.me/api/portraits/women/44.jpg',
+  'Fernando Costa': 'https://randomuser.me/api/portraits/men/22.jpg',
+  'Lucia Gomes': 'https://randomuser.me/api/portraits/women/63.jpg',
+  'Pedro Alves': 'https://randomuser.me/api/portraits/men/67.jpg',
 };
 
 // --- COMPONENTES VISUAIS (Avatares e Logos) ---
@@ -87,7 +87,7 @@ const Avatar = ({ name, className = "w-10 h-10" }) => {
   );
 };
 
-// --- BANCO DE DADOS MOCK ---
+// --- BANCO DE DADOS MOCK (EXPANDIDO) ---
 const MOCK_INVENTORY = [
   { id: 1, sku: 'SYNC-EL-001', name: 'iPhone 15 Pro Max 256GB', qty: 1250, client: 'Apple', status: 'Adequado', corredor: 'A-12', prateleira: 'P-04' },
   { id: 2, sku: 'SYNC-MD-045', name: 'Cadeira Gamer DXRacer', qty: 15, client: 'Amazon', status: 'Crítico', corredor: 'C-05', prateleira: 'P-01' },
@@ -97,6 +97,13 @@ const MOCK_INVENTORY = [
   { id: 6, sku: 'SYNC-UD-301', name: 'Air Fryer Mondial 4L', qty: 3200, client: 'Americanas', status: 'Adequado', corredor: 'D-15', prateleira: 'P-01' },
   { id: 7, sku: 'SYNC-SP-887', name: 'Tênis Nike Revolution', qty: 1100, client: 'Shopee', status: 'Adequado', corredor: 'G-11', prateleira: 'P-08' },
   { id: 8, sku: 'SYNC-FW-991', name: 'Bolsa Couro Legítimo', qty: 25, client: 'Dafiti', status: 'Crítico', corredor: 'F-02', prateleira: 'P-05' },
+  // Novos Itens para preencher a tela
+  { id: 9, sku: 'SYNC-EL-002', name: 'MacBook Pro M3 14"', qty: 450, client: 'Apple', status: 'Adequado', corredor: 'A-13', prateleira: 'P-01' },
+  { id: 10, sku: 'SYNC-MD-046', name: 'Kindle Paperwhite 16GB', qty: 2100, client: 'Amazon', status: 'Adequado', corredor: 'C-06', prateleira: 'P-05' },
+  { id: 11, sku: 'SYNC-AC-103', name: 'Echo Dot 5ª Geração', qty: 530, client: 'Mercado Livre', status: 'Atenção', corredor: 'A-02', prateleira: 'P-02' },
+  { id: 12, sku: 'SYNC-UD-302', name: 'Geladeira Frost Free 400L', qty: 12, client: 'Americanas', status: 'Crítico', corredor: 'D-16', prateleira: 'P-10' },
+  { id: 13, sku: 'SYNC-CG-012', name: 'Controle DualSense PS5', qty: 850, client: 'PlayStation', status: 'Adequado', corredor: 'A-10', prateleira: 'P-04' },
+  { id: 14, sku: 'SYNC-TV-100', name: 'Monitor Gamer LG UltraGear 27"', qty: 120, client: 'LG', status: 'Atenção', corredor: 'B-03', prateleira: 'P-01' },
 ];
 
 const MOCK_ROUTES = [
@@ -104,6 +111,11 @@ const MOCK_ROUTES = [
   { id: 'VTR-02', driver: 'Marcos Silva', phone: '(11) 91234-5678', plate: 'QWE-1234', status: 'Atrasado', location: 'Rod. Dutra, Km 210', dest: 'São José dos Campos', eta: '2h 10m', speed: '0 km/h', temp: '22°C', cargo: [{ item: 'Smart TV LG', qty: 30, client: 'LG' }, { item: 'Air Fryer Mondial', qty: 120, client: 'Americanas' }] },
   { id: 'VTR-03', driver: 'Carla Dias', phone: '(11) 95555-4444', plate: 'ABC-5678', status: 'Em Rota', location: 'Rod. Castelo Branco', dest: 'Sorocaba, SP', eta: '55 min', speed: '90 km/h', temp: '19°C', cargo: [{ item: 'Tênis Nike', qty: 200, client: 'Shopee' }, { item: 'Bolsa Couro', qty: 55, client: 'Dafiti' }] },
   { id: 'VTR-04', driver: 'Carlos Silva', phone: '(11) 99999-1111', plate: 'BRA-3R56', status: 'Em Rota', location: 'Rua Augusta', dest: 'Centro de SP', eta: '15 min', speed: '30 km/h', temp: '20°C', cargo: [{ item: 'Cadeira Gamer', qty: 10, client: 'Amazon' }, { item: 'AirPods Pro 2', qty: 150, client: 'Mercado Livre' }] },
+  // Novos Motoristas
+  { id: 'VTR-05', driver: 'Ana Souza', phone: '(11) 98888-2222', plate: 'MNO-5566', status: 'Em Rota', location: 'Rod. dos Bandeirantes', dest: 'Campinas, SP', eta: '1h 20m', speed: '85 km/h', temp: '21°C', cargo: [{ item: 'MacBook Pro M3', qty: 25, client: 'Apple' }] },
+  { id: 'VTR-06', driver: 'Fernando Costa', phone: '(11) 97777-3333', plate: 'GHI-9876', status: 'Parado', location: 'Posto Graal, Rod. Anhanguera', dest: 'Ribeirão Preto, SP', eta: '3h 15m', speed: '0 km/h', temp: '23°C', cargo: [{ item: 'Geladeira Frost Free', qty: 5, client: 'Americanas' }] },
+  { id: 'VTR-07', driver: 'Lucia Gomes', phone: '(11) 96666-4444', plate: 'JKL-4321', status: 'Em Rota', location: 'Av. dos Bandeirantes', dest: 'Aeroporto de Congonhas', eta: '25 min', speed: '60 km/h', temp: '19°C', cargo: [{ item: 'Kindle Paperwhite', qty: 300, client: 'Amazon' }, { item: 'Echo Dot 5ª Geração', qty: 150, client: 'Mercado Livre' }] },
+  { id: 'VTR-08', driver: 'Pedro Alves', phone: '(11) 95555-5555', plate: 'DEF-6789', status: 'Atenção', location: 'Rodoanel Mário Covas', dest: 'Santo André, SP', eta: '1h 05m', speed: '40 km/h', temp: '20°C', cargo: [{ item: 'Monitor Gamer LG', qty: 40, client: 'LG' }, { item: 'Controle DualSense', qty: 100, client: 'PlayStation' }] },
 ];
 
 const MOCK_SHIPMENTS = {
@@ -160,6 +172,7 @@ export default function App() {
   const [selectedDelivery, setSelectedDelivery] = useState(null);
   const [selectedRoute, setSelectedRoute] = useState(null);
   const [selectedProblem, setSelectedProblem] = useState(null);
+  const [selectedSystem, setSelectedSystem] = useState(null); // Estado para o modal do sistema
   const [activeBar, setActiveBar] = useState(null);
 
   const toggleTheme = () => setIsDark(!isDark);
@@ -185,14 +198,13 @@ export default function App() {
     if (!trackingId.trim()) return;
     setSearchError(''); setIsSearching(true); setSearchedShipment(null);
     setTimeout(() => {
-      // Alterado para SYNC para corresponder ao novo nome LOGISYNC
       const result = MOCK_SHIPMENTS[trackingId.toUpperCase()];
       if (result) setSearchedShipment(result);
       else setSearchError('Código não encontrado. Tente SYNC-84920');
       setIsSearching(false);
     }, 800);
   };
-  
+
   const navItems = [
     { id: 'dashboard', icon: Activity, label: 'Painel' },
     { id: 'estoque', icon: Box, label: 'Estoque' },
@@ -203,7 +215,7 @@ export default function App() {
   const getStatusColor = (status) => {
     if (status === 'Adequado' || status === 'Normal' || status === 'Em Rota') return 'bg-emerald-100/20 text-emerald-600 border border-emerald-200/30';
     if (status === 'Atenção' || status === 'Parado') return 'bg-amber-100/20 text-amber-500 border border-amber-200/30';
-    if (status === 'Crítico' || status === 'Atrasado') return 'bg-red-100/20 text-red-500 border border-red-200/30';
+    if (status === 'Crítico' || status === 'Atrasado' || status === 'Instável') return 'bg-red-100/20 text-red-500 border border-red-200/30';
     return 'bg-slate-100/10 text-slate-400';
   };
 
@@ -223,7 +235,7 @@ export default function App() {
       </div>
     </div>
   );
-
+  
   const renderNav = () => (
     <>
       <nav className={`md:hidden fixed bottom-0 left-0 right-0 ${theme.navBottom} backdrop-blur-md border-t pb-safe pt-2 px-4 flex justify-around z-50 transition-colors duration-300`}>
@@ -240,7 +252,7 @@ export default function App() {
         })}
       </nav>
 
-      <aside className={`hidden md:flex flex-col w-[260px] h-screen bg-slate-950 text-white p-6 sticky top-0 shadow-2xl z-40 border-r border-slate-900`}>
+      <aside className={`hidden md:flex flex-col w-[260px] h-screen bg-slate-950 text-white p-6 sticky top-0 shadow-2xl z-40 border-r border-slate-900 shrink-0`}>
         <div onClick={toggleTheme} className="flex items-center gap-3 mb-10 cursor-pointer group hover:bg-white/5 p-2 rounded-xl transition-all" title="Mudar Tema">
           <div className="bg-gradient-to-tr from-indigo-600 to-cyan-500 p-2.5 rounded-xl shadow-lg shadow-indigo-500/30 group-hover:scale-105 transition-transform shrink-0">
             <Hexagon className="w-6 h-6 text-white" />
@@ -278,9 +290,10 @@ export default function App() {
       <CustomStyles />
       {renderNav()}
 
-      <main className="flex-1 w-full max-w-[1200px] mx-auto md:p-6 animate-in fade-in duration-300">
+      {/* EXPANSÃO DE LAYOUT: O max-w agora é 1600px para aproveitar telas grandes como a do seu PC */}
+      <main className="flex-1 w-full 2xl:max-w-[1600px] mx-auto md:px-10 md:py-8 animate-in fade-in duration-300 overflow-x-hidden">
         
-        {/* HEADER MOBILE COM NOVO NOME E SLOGAN */}
+        {/* HEADER MOBILE */}
         <header className={`md:hidden flex items-center justify-between p-4 ${theme.header} sticky top-0 z-30 backdrop-blur-md border-b transition-colors duration-500`}>
           <div className="flex items-center gap-2.5 cursor-pointer group" onClick={toggleTheme} title="Mudar Tema">
             <div className="bg-gradient-to-tr from-indigo-600 to-cyan-500 p-2 rounded-lg shadow-md group-hover:scale-105 transition-transform shrink-0">
@@ -316,18 +329,18 @@ export default function App() {
                   { id: 'problemas', label: 'Problemas', value: '12', trend: '-2%', icon: AlertTriangle, color: 'from-rose-600 to-red-500' },
                   { id: 'sla', label: 'Meta de SLA', value: '98.5%', trend: '+0.5%', icon: CheckCircle2, color: 'from-emerald-600 to-emerald-400' },
                 ].map((kpi, idx) => (
-                  <button key={idx} onClick={() => setActiveModal(kpi.id)} className={`text-left ${theme.card} p-5 rounded-2xl border ${theme.border} ${theme.cardHover} transition-all duration-200 relative overflow-hidden group focus:outline-none focus:ring-2 focus:ring-indigo-500/30`}>
+                  <button key={idx} onClick={() => setActiveModal(kpi.id)} className={`text-left ${theme.card} p-5 md:p-6 rounded-2xl border ${theme.border} ${theme.cardHover} transition-all duration-200 relative overflow-hidden group focus:outline-none focus:ring-2 focus:ring-indigo-500/30`}>
                     <div className={`absolute -top-4 -right-4 p-2 opacity-5 group-hover:opacity-10 transition-all transform group-hover:scale-110 ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                      <kpi.icon className="w-24 h-24" />
+                      <kpi.icon className="w-24 h-24 md:w-32 md:h-32" />
                     </div>
                     <div className="flex justify-between items-start mb-4">
                       <div className={`inline-flex p-2.5 rounded-xl bg-gradient-to-tr ${kpi.color} shadow-md text-white`}>
-                        <kpi.icon className="w-6 h-6" />
+                        <kpi.icon className="w-6 h-6 md:w-8 md:h-8" />
                       </div>
                       <ChevronRight className={`w-5 h-5 ${theme.textSec} group-hover:text-indigo-500`} />
                     </div>
-                    <p className={`text-xs ${theme.textSec} font-bold uppercase tracking-wider mb-1`}>{kpi.label}</p>
-                    <p className={`text-3xl md:text-4xl font-black ${theme.textMain} tracking-tight`}>{kpi.value}</p>
+                    <p className={`text-xs md:text-sm ${theme.textSec} font-bold uppercase tracking-wider mb-1`}>{kpi.label}</p>
+                    <p className={`text-3xl md:text-5xl font-black ${theme.textMain} tracking-tight`}>{kpi.value}</p>
                     <div className="mt-4">
                        <span className={`text-[10px] md:text-xs font-bold px-2 py-1 rounded-md ${kpi.trend.includes('+') ? 'text-emerald-600 bg-emerald-100/20 border border-emerald-200/30' : kpi.trend.includes('-') ? 'text-red-500 bg-red-100/20 border border-red-200/30' : 'text-slate-400 bg-slate-100/10 border border-slate-200/20'}`}>{kpi.trend} em 24h</span>
                     </div>
@@ -336,71 +349,71 @@ export default function App() {
               </div>
 
               {/* Gráfico */}
-              <div className={`${theme.card} p-5 md:p-6 rounded-2xl border ${theme.border}`}>
-                <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-8 gap-3">
+              <div className={`${theme.card} p-5 md:p-8 rounded-2xl border ${theme.border}`}>
+                <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-10 gap-3">
                   <div>
-                    <h3 className={`font-black text-lg ${theme.textMain} flex items-center gap-2`}><TrendingUp className="w-5 h-5 text-indigo-500"/> Volume de Expedição</h3>
+                    <h3 className={`font-black text-lg md:text-xl ${theme.textMain} flex items-center gap-2`}><TrendingUp className="w-5 h-5 text-indigo-500"/> Volume de Expedição</h3>
                   </div>
-                  <div className="flex gap-3">
-                    <span className="flex items-center gap-1 text-[10px] font-bold text-emerald-500"><span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Normal</span>
-                    <span className="flex items-center gap-1 text-[10px] font-bold text-amber-500"><span className="w-2.5 h-2.5 rounded-full bg-amber-500"></span> Atenção</span>
-                    <span className="flex items-center gap-1 text-[10px] font-bold text-red-500"><span className="w-2.5 h-2.5 rounded-full bg-red-500"></span> Crítico</span>
+                  <div className="flex gap-4">
+                    <span className="flex items-center gap-1.5 text-xs font-bold text-emerald-500"><span className="w-3 h-3 rounded-full bg-emerald-500 shadow-md"></span> Normal</span>
+                    <span className="flex items-center gap-1.5 text-xs font-bold text-amber-500"><span className="w-3 h-3 rounded-full bg-amber-500 shadow-md"></span> Atenção</span>
+                    <span className="flex items-center gap-1.5 text-xs font-bold text-red-500"><span className="w-3 h-3 rounded-full bg-red-500 shadow-md"></span> Crítico</span>
                   </div>
                 </div>
                 
-                <div className="h-40 md:h-48 flex items-end justify-between gap-1 md:gap-3 px-1 relative">
+                <div className="h-48 md:h-64 flex items-end justify-between gap-2 md:gap-4 px-1 relative">
                   {CHART_DATA.map((data, i) => {
                     const heightPercent = (data.volume / 1450) * 100;
                     const isActive = activeBar === i;
                     let barColor = data.status === 'critical' ? 'bg-red-500' : data.status === 'attention' ? 'bg-amber-400' : 'bg-emerald-500';
                     if (isActive) {
-                      barColor = data.status === 'critical' ? 'bg-red-600 shadow-[0_0_15px_rgba(220,38,38,0.6)]' : data.status === 'attention' ? 'bg-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.6)]' : 'bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.6)]';
+                      barColor = data.status === 'critical' ? 'bg-red-600 shadow-[0_0_20px_rgba(220,38,38,0.5)]' : data.status === 'attention' ? 'bg-amber-500 shadow-[0_0_20px_rgba(245,158,11,0.5)]' : 'bg-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.5)]';
                     }
 
                     return (
                       <div key={i} onClick={() => setActiveBar(isActive ? null : i)} className="w-full h-full flex items-end justify-center relative cursor-pointer group">
                         {isActive && (
-                          <div className={`absolute -top-16 left-1/2 -translate-x-1/2 ${isDark ? 'bg-white text-slate-900' : 'bg-slate-900 text-white'} px-3 py-2 rounded-xl text-xs font-black shadow-xl whitespace-nowrap z-20 animate-in zoom-in-95`}>
+                          <div className={`absolute -top-16 left-1/2 -translate-x-1/2 ${isDark ? 'bg-white text-slate-900' : 'bg-slate-900 text-white'} px-4 py-2 rounded-xl text-xs font-black shadow-xl whitespace-nowrap z-20 animate-in zoom-in-95`}>
                             <span className="text-indigo-500 text-[10px] uppercase block leading-none mb-1">{data.time}</span>
-                            {data.volume} Caixas
-                            <div className={`absolute -bottom-1 left-1/2 -translate-x-1/2 w-3 h-3 ${isDark ? 'bg-white' : 'bg-slate-900'} rotate-45`}></div>
+                            <span className="text-sm">{data.volume} Caixas</span>
+                            <div className={`absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 ${isDark ? 'bg-white' : 'bg-slate-900'} rotate-45`}></div>
                           </div>
                         )}
-                        <div className={`w-full ${isDark ? 'bg-slate-800' : 'bg-slate-50'} rounded-t-lg relative h-full flex items-end overflow-hidden`}>
-                          <div className={`w-full rounded-t-lg transition-all duration-300 ${barColor} ${isActive ? 'scale-y-[1.02]' : 'opacity-80 group-hover:opacity-100'}`} style={{ height: `${heightPercent}%` }}></div>
+                        <div className={`w-full ${isDark ? 'bg-slate-800' : 'bg-slate-50'} rounded-t-xl relative h-full flex items-end overflow-hidden`}>
+                          <div className={`w-full rounded-t-xl transition-all duration-300 ${barColor} ${isActive ? 'scale-y-[1.02]' : 'opacity-80 group-hover:opacity-100'}`} style={{ height: `${heightPercent}%` }}></div>
                         </div>
-                        <span className={`absolute -bottom-6 text-[9px] md:text-[10px] font-bold uppercase ${isActive ? 'text-indigo-500 scale-110' : theme.textSec} ${i % 2 !== 0 && 'hidden sm:block'} transition-transform`}>{data.time}</span>
+                        <span className={`absolute -bottom-8 text-[9px] md:text-xs font-bold uppercase ${isActive ? 'text-indigo-500 scale-110' : theme.textSec} ${i % 2 !== 0 && 'hidden sm:block'} transition-transform`}>{data.time}</span>
                       </div>
                     )
                   })}
                 </div>
-                <div className="mt-8"></div>
+                <div className="mt-10"></div>
               </div>
             </div>
           )}
 
           {/* =========================================
-              ABA 2: ESTOQUE WMS 
+              ABA 2: ESTOQUE WMS (MAIS ITENS NA TELA)
           ============================================= */}
           {activeTab === 'estoque' && (
             <div className="space-y-6 animate-in fade-in duration-500">
                <div>
                   <h2 className={`text-2xl md:text-3xl font-black ${theme.textMain} tracking-tight`}>Estoque WMS</h2>
-                  <p className={`${theme.textSec} font-medium text-sm mt-1`}>Inventário agrupado por cliente B2B.</p>
+                  <p className={`${theme.textSec} font-medium text-sm mt-1`}>Inventário agrupado por cliente B2B. Atualizado em tempo real.</p>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 md:gap-5">
                 {MOCK_INVENTORY.map((item) => (
-                  <button key={item.id} onClick={() => setSelectedProduct(item)} className={`text-left ${theme.card} p-5 rounded-2xl border ${theme.border} ${theme.cardHover} transition-all duration-200 flex flex-col group w-full focus:outline-none`}>
-                    <div className="flex justify-between items-center mb-4 w-full">
-                      <CompanyLogo name={item.client} className="w-10 h-10" />
+                  <button key={item.id} onClick={() => setSelectedProduct(item)} className={`text-left ${theme.card} p-5 md:p-6 rounded-2xl border ${theme.border} ${theme.cardHover} transition-all duration-200 flex flex-col group w-full focus:outline-none`}>
+                    <div className="flex justify-between items-center mb-5 w-full">
+                      <CompanyLogo name={item.client} className="w-12 h-12" />
                       <span className={`px-2.5 py-1 text-[9px] font-black uppercase tracking-wider rounded-lg ${getStatusColor(item.status)}`}>{item.status}</span>
                     </div>
-                    <p className={`text-[10px] font-bold uppercase tracking-widest ${theme.textSec} mb-1`}>{item.sku}</p>
-                    <h3 className={`font-black text-base ${theme.textMain} mb-5 leading-tight flex-1 group-hover:text-indigo-500 transition-colors line-clamp-2`}>{item.name}</h3>
+                    <p className={`text-[10px] md:text-xs font-bold uppercase tracking-widest ${theme.textSec} mb-1`}>{item.sku}</p>
+                    <h3 className={`font-black text-base md:text-lg ${theme.textMain} mb-6 leading-tight flex-1 group-hover:text-indigo-500 transition-colors line-clamp-2`}>{item.name}</h3>
                     <div className={`pt-4 border-t ${theme.border} flex items-end justify-between w-full`}>
                       <div>
                         <p className={`text-[9px] font-bold uppercase ${theme.textSec} mb-0.5`}>Qtd Estoque</p>
-                        <p className={`text-2xl font-black ${theme.textMain}`}>{item.qty}</p>
+                        <p className={`text-2xl md:text-3xl font-black ${theme.textMain}`}>{item.qty}</p>
                       </div>
                       <ChevronRight className={`w-5 h-5 ${theme.textSec} group-hover:text-indigo-500`} />
                     </div>
@@ -411,13 +424,13 @@ export default function App() {
           )}
 
           {/* =========================================
-              ABA 3: RASTREAMENTO COM A IMAGEM DE CAPA
+              ABA 3: RASTREAMENTO (BARRAS CLICÁVEIS E MAIS DADOS)
           ============================================= */}
           {activeTab === 'rastreamento' && (
              <div className="w-full space-y-6 animate-in fade-in duration-500">
                               
               <div 
-                className="relative w-full rounded-3xl overflow-hidden shadow-lg flex flex-col items-center justify-center p-8 md:p-14 mb-8"
+                className="relative w-full rounded-3xl overflow-hidden shadow-lg flex flex-col items-center justify-center p-8 md:p-16 mb-8"
                 style={{
                   backgroundImage: `url(${TRACKING_BG_URL})`,
                   backgroundSize: 'cover',
@@ -428,20 +441,20 @@ export default function App() {
                 
                 <div className="relative z-10 flex flex-col items-center text-center w-full max-w-2xl">
                   <div className="inline-flex items-center justify-center p-4 bg-white/10 backdrop-blur-md rounded-full mb-4 border border-white/20 shadow-xl">
-                    <Search className="w-8 h-8 text-white" />
+                    <Search className="w-8 h-8 md:w-10 md:h-10 text-white" />
                   </div>
                   <h2 className="text-3xl md:text-5xl font-black text-white tracking-tight mb-2">Buscar Encomenda</h2>
                   <p className="text-indigo-200 font-bold text-sm md:text-base mb-8">Acompanhe pacotes e veículos em tempo real.</p>
                   
                   <form onSubmit={handleTrackingSearch} className="relative w-full">
                     <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none">
-                      <Package className="w-5 h-5 text-indigo-500" />
+                      <Package className="w-5 h-5 md:w-6 md:h-6 text-indigo-500" />
                     </div>
                     <input 
                       type="text" placeholder="Ex: SYNC-84920" value={trackingId} onChange={(e) => setTrackingId(e.target.value)}
-                      className="w-full pl-12 pr-32 py-4 md:py-5 rounded-2xl border-0 bg-white/95 backdrop-blur-md text-lg font-black uppercase placeholder:normal-case placeholder:font-bold placeholder:text-slate-400 text-slate-900 transition-all shadow-2xl focus:ring-4 focus:ring-indigo-500/50"
+                      className="w-full pl-14 pr-32 py-4 md:py-5 rounded-2xl border-0 bg-white/95 backdrop-blur-md text-lg md:text-xl font-black uppercase placeholder:normal-case placeholder:font-bold placeholder:text-slate-400 text-slate-900 transition-all shadow-2xl focus:ring-4 focus:ring-indigo-500/50"
                     />
-                    <button type="submit" disabled={isSearching} className="absolute right-2 top-2 bottom-2 bg-indigo-600 hover:bg-indigo-500 text-white px-6 rounded-xl font-bold text-sm transition-all flex justify-center items-center disabled:opacity-70 shadow-md">
+                    <button type="submit" disabled={isSearching} className="absolute right-2 top-2 bottom-2 bg-indigo-600 hover:bg-indigo-500 text-white px-6 md:px-8 rounded-xl font-bold text-sm transition-all flex justify-center items-center disabled:opacity-70 shadow-md">
                       {isSearching ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> : 'Buscar'}
                     </button>
                   </form>
@@ -449,54 +462,56 @@ export default function App() {
               </div>
 
               {searchError && (
-                <div className="p-4 bg-red-500/10 text-red-500 rounded-xl border border-red-500/20 flex items-center justify-center gap-3 font-bold text-sm animate-in zoom-in-95 shadow-sm max-w-4xl mx-auto">
+                <div className="p-4 bg-red-500/10 text-red-500 rounded-xl border border-red-500/20 flex items-center justify-center gap-3 font-bold text-sm animate-in zoom-in-95 shadow-sm max-w-5xl mx-auto">
                   <AlertTriangle className="w-5 h-5" /> {searchError}
                 </div>
               )}
 
               {searchedShipment && (
-                <div className={`${theme.card} rounded-3xl border ${theme.border} overflow-hidden animate-in slide-in-from-bottom-4 shadow-lg max-w-3xl mx-auto`}>
-                  <div className="bg-slate-900 text-white p-6 relative overflow-hidden">
+                 /* ... Exibição do Rastreio Encontrado ... */
+                <div className={`${theme.card} rounded-3xl border ${theme.border} overflow-hidden animate-in slide-in-from-bottom-4 shadow-xl max-w-4xl mx-auto`}>
+                  <div className="bg-slate-900 text-white p-6 md:p-8 relative overflow-hidden">
                     <div className="absolute -right-10 -top-10 w-40 h-40 bg-indigo-500 rounded-full blur-[60px] opacity-30"></div>
                     <div className="relative z-10 flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4">
                       <div>
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/10 rounded-lg text-[10px] font-black uppercase tracking-widest text-indigo-200 backdrop-blur-md mb-4 border border-white/10">
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/10 rounded-lg text-[10px] md:text-xs font-black uppercase tracking-widest text-indigo-200 backdrop-blur-md mb-4 border border-white/10">
                           <Truck className="w-3.5 h-3.5" /> Em Transporte
                         </span>
-                        <h3 className="text-3xl font-black tracking-tight">{searchedShipment.id}</h3>
-                        <div className="mt-3 flex items-center gap-3">
-                           <CompanyLogo name={searchedShipment.client} className="w-8 h-8 border-none" />
-                           <span className="text-sm font-bold text-white">{searchedShipment.client}</span>
+                        <h3 className="text-3xl md:text-4xl font-black tracking-tight">{searchedShipment.id}</h3>
+                        <div className="mt-4 flex items-center gap-3">
+                           <CompanyLogo name={searchedShipment.client} className="w-10 h-10 border-none" />
+                           <span className="text-sm md:text-base font-bold text-white">{searchedShipment.client}</span>
                         </div>
                       </div>
-                      <div className="bg-white/10 p-4 rounded-2xl backdrop-blur-md border border-white/10">
-                        <p className="text-[10px] text-slate-300 font-bold uppercase tracking-widest mb-1">Previsão (ETA)</p>
-                        <p className="text-xl font-black text-emerald-400 flex items-center gap-2"><Clock className="w-5 h-5" /> {searchedShipment.eta}</p>
+                      <div className="bg-white/10 p-5 rounded-2xl backdrop-blur-md border border-white/10">
+                        <p className="text-[10px] md:text-xs text-slate-300 font-bold uppercase tracking-widest mb-1">Previsão (ETA)</p>
+                        <p className="text-xl md:text-2xl font-black text-emerald-400 flex items-center gap-2"><Clock className="w-5 h-5 md:w-6 md:h-6" /> {searchedShipment.eta}</p>
                       </div>
                     </div>
                   </div>
-                  <div className="p-6 space-y-6">
+                  <div className="p-6 md:p-8 space-y-8">
                     <div>
-                      <div className="flex justify-between text-xs font-black text-slate-500 uppercase tracking-wider mb-2">
+                      <div className="flex justify-between text-xs md:text-sm font-black text-slate-500 uppercase tracking-wider mb-3">
                         <span>Origem</span><span className="text-indigo-500">{searchedShipment.progress}%</span><span>Destino</span>
                       </div>
-                      <div className={`h-3 ${isDark ? 'bg-slate-800' : 'bg-slate-100'} rounded-full overflow-hidden relative shadow-inner`}>
+                      <div className={`h-3 md:h-4 ${isDark ? 'bg-slate-800' : 'bg-slate-100'} rounded-full overflow-hidden relative shadow-inner`}>
                         <div className="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-500 to-emerald-400 rounded-full transition-all duration-1000" style={{ width: `${searchedShipment.progress}%` }}></div>
                       </div>
                     </div>
                     
-                    <div className={`flex flex-col sm:flex-row gap-6 pt-6 border-t ${theme.border}`}>
-                      <div className={`flex-1 flex items-center gap-4 ${isDark ? 'bg-slate-800' : 'bg-slate-50'} p-4 rounded-2xl border ${theme.border}`}>
-                        <Avatar name={searchedShipment.driver} className="w-12 h-12" />
+                    <div className={`flex flex-col sm:flex-row gap-6 pt-8 border-t ${theme.border}`}>
+                      <div className={`flex-1 flex items-center gap-5 ${isDark ? 'bg-slate-800' : 'bg-slate-50'} p-5 rounded-2xl border ${theme.border}`}>
+                        <Avatar name={searchedShipment.driver} className="w-14 h-14" />
                         <div>
-                           <p className="font-black text-base text-slate-800 dark:text-white">{searchedShipment.driver}</p>
-                           <p className="text-[10px] font-black text-slate-500 bg-slate-200 dark:bg-slate-700 inline-block px-2 py-1 rounded-md uppercase mt-1">{searchedShipment.plate}</p>
+                           <p className="font-black text-lg text-slate-800 dark:text-white">{searchedShipment.driver}</p>
+                           <p className="text-[10px] md:text-xs font-black text-slate-500 bg-slate-200 dark:bg-slate-700 inline-block px-2 py-1 rounded-md uppercase mt-1">{searchedShipment.plate}</p>
                         </div>
                       </div>
-                      <div className="flex-1 space-y-4 sm:pl-4 sm:border-l-2 border-indigo-500/20">
+                      <div className="flex-1 space-y-5 sm:pl-6 sm:border-l-2 border-indigo-500/20">
                          {searchedShipment.events.map((evt, i) => (
-                           <div key={i}>
-                             <p className={`font-black text-sm ${i === 0 ? 'text-indigo-500' : theme.textSec}`}>{evt.desc}</p>
+                           <div key={i} className="relative">
+                             <div className="absolute -left-7 top-1 w-2.5 h-2.5 rounded-full bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]"></div>
+                             <p className={`font-black text-sm md:text-base ${i === 0 ? 'text-indigo-500' : theme.textSec}`}>{evt.desc}</p>
                              <p className={`text-xs font-bold ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>{evt.time}</p>
                            </div>
                          ))}
@@ -507,104 +522,141 @@ export default function App() {
               )}
 
               {!searchedShipment && !isSearching && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-in fade-in max-w-4xl mx-auto">
-                   <div className={`${theme.card} p-5 rounded-2xl border ${theme.border}`}>
-                      <h4 className={`text-xs font-black ${theme.textSec} uppercase tracking-widest mb-4 flex items-center gap-2`}><History className="w-4 h-4"/> Histórico Recente</h4>
-                      <div className="space-y-3">
-                        <div className={`flex items-center justify-between p-3 rounded-xl ${isDark ? 'bg-slate-800' : 'bg-slate-50'}`}>
-                           <div className="flex items-center gap-3">
-                             <div className="bg-emerald-500/10 p-2 rounded-lg"><CheckCircle2 className="w-4 h-4 text-emerald-500" /></div>
-                             <div><p className={`font-bold text-sm ${theme.textMain}`}>SYNC-11203</p><p className="text-[10px] font-bold text-slate-400">Há 2 horas</p></div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 animate-in fade-in mx-auto">
+                   <div className={`${theme.card} p-6 rounded-3xl border ${theme.border}`}>
+                      <h4 className={`text-xs font-black ${theme.textSec} uppercase tracking-widest mb-5 flex items-center gap-2`}><History className="w-4 h-4"/> Histórico Recente</h4>
+                      <div className="space-y-4">
+                        <div className={`flex items-center justify-between p-4 rounded-xl ${isDark ? 'bg-slate-800' : 'bg-slate-50'} border ${theme.border}`}>
+                           <div className="flex items-center gap-4">
+                             <div className="bg-emerald-500/10 p-2.5 rounded-lg"><CheckCircle2 className="w-5 h-5 text-emerald-500" /></div>
+                             <div><p className={`font-black text-sm ${theme.textMain}`}>SYNC-11203</p><p className="text-[10px] font-bold text-slate-400">Há 2 horas</p></div>
                            </div>
-                           <span className="text-[9px] font-black text-emerald-500 uppercase">Entregue</span>
+                           <span className="text-[9px] font-black text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded uppercase">Entregue</span>
                         </div>
-                        <div className={`flex items-center justify-between p-3 rounded-xl ${isDark ? 'bg-slate-800' : 'bg-slate-50'}`}>
-                           <div className="flex items-center gap-3">
-                             <div className="bg-amber-500/10 p-2 rounded-lg"><Truck className="w-4 h-4 text-amber-500" /></div>
-                             <div><p className={`font-bold text-sm ${theme.textMain}`}>SYNC-90881</p><p className="text-[10px] font-bold text-slate-400">Há 5 horas</p></div>
+                        <div className={`flex items-center justify-between p-4 rounded-xl ${isDark ? 'bg-slate-800' : 'bg-slate-50'} border ${theme.border}`}>
+                           <div className="flex items-center gap-4">
+                             <div className="bg-amber-500/10 p-2.5 rounded-lg"><Truck className="w-5 h-5 text-amber-500" /></div>
+                             <div><p className={`font-black text-sm ${theme.textMain}`}>SYNC-90881</p><p className="text-[10px] font-bold text-slate-400">Há 5 horas</p></div>
                            </div>
-                           <span className="text-[9px] font-black text-amber-500 uppercase">Em Rota</span>
+                           <span className="text-[9px] font-black text-amber-500 bg-amber-500/10 px-2 py-1 rounded uppercase">Em Rota</span>
                         </div>
                       </div>
                    </div>
                    
-                   <div className={`${theme.card} p-5 rounded-2xl border ${theme.border}`}>
-                      <h4 className={`text-xs font-black ${theme.textSec} uppercase tracking-widest mb-4 flex items-center gap-2`}><Satellite className="w-4 h-4"/> Sistemas de Rastreio</h4>
+                   <div className={`${theme.card} p-6 rounded-3xl border ${theme.border}`}>
+                      <h4 className={`text-xs font-black ${theme.textSec} uppercase tracking-widest mb-5 flex items-center gap-2`}><Satellite className="w-4 h-4"/> Sistemas de Rastreio (Clicável)</h4>
                       <div className="space-y-4">
-                        <div>
-                          <div className="flex justify-between mb-1"><span className={`text-[10px] font-bold ${theme.textMain}`}>API Correios</span><span className="text-[10px] font-bold text-emerald-500">Online</span></div>
-                          <div className={`w-full ${isDark ? 'bg-slate-800' : 'bg-slate-100'} rounded-full h-1.5`}><div className="bg-emerald-500 h-1.5 rounded-full w-full"></div></div>
+                        {[
+                          { name: 'API Correios', status: 'Online', color: 'emerald-500', progress: 100, ping: '24ms', uptime: '99.9%' },
+                          { name: 'Satélite Frota Própria', status: 'Online', color: 'emerald-500', progress: 100, ping: '12ms', uptime: '100%' },
+                          { name: 'Integração Transportadoras', status: 'Instável', color: 'red-500', progress: 80, ping: '245ms', uptime: '94.2%', pulse: true },
+                        ].map((sys, idx) => (
+                          <button key={idx} onClick={() => setSelectedSystem(sys)} className={`w-full text-left p-3 -mx-3 rounded-xl transition-all hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-${sys.color}/50 group`}>
+                            <div className="flex justify-between items-center mb-2 px-1">
+                              <span className={`text-[11px] font-bold ${theme.textMain} group-hover:text-indigo-500 flex items-center gap-1.5`}><Activity className="w-3 h-3"/> {sys.name}</span>
+                              <span className={`text-[10px] font-black text-${sys.color} bg-${sys.color}/10 px-2 py-0.5 rounded uppercase`}>{sys.status}</span>
+                            </div>
+                            <div className={`w-full ${isDark ? 'bg-slate-700' : 'bg-slate-200'} rounded-full h-2`}>
+                              <div className={`bg-${sys.color} h-2 rounded-full transition-all duration-500 ${sys.pulse ? 'animate-pulse' : ''}`} style={{ width: `${sys.progress}%` }}></div>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                   </div>
+
+                   {/* NOVO CARTÃO PARA PREENCHER O ESPAÇO */}
+                   <div className={`${theme.card} p-6 rounded-3xl border ${theme.border} flex flex-col`}>
+                      <h4 className={`text-xs font-black ${theme.textSec} uppercase tracking-widest mb-5 flex items-center gap-2`}><Server className="w-4 h-4"/> Infraestrutura Cloud</h4>
+                      <div className="space-y-5 flex-1 flex flex-col justify-center">
+                        <div className={`flex items-center justify-between p-3 rounded-lg border ${theme.border} ${isDark ? 'bg-slate-800/50' : 'bg-slate-50'}`}>
+                           <div className="flex items-center gap-3">
+                             <HardDrive className={`w-4 h-4 ${theme.textSec}`}/>
+                             <div><p className={`text-[10px] font-black uppercase ${theme.textMain}`}>AWS - São Paulo (sa-east-1)</p></div>
+                           </div>
+                           <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
                         </div>
-                        <div>
-                          <div className="flex justify-between mb-1"><span className={`text-[10px] font-bold ${theme.textMain}`}>Satelite Frota Própria</span><span className="text-[10px] font-bold text-emerald-500">Online</span></div>
-                          <div className={`w-full ${isDark ? 'bg-slate-800' : 'bg-slate-100'} rounded-full h-1.5`}><div className="bg-emerald-500 h-1.5 rounded-full w-full"></div></div>
+                        <div className={`flex items-center justify-between p-3 rounded-lg border ${theme.border} ${isDark ? 'bg-slate-800/50' : 'bg-slate-50'}`}>
+                           <div className="flex items-center gap-3">
+                             <HardDrive className={`w-4 h-4 ${theme.textSec}`}/>
+                             <div><p className={`text-[10px] font-black uppercase ${theme.textMain}`}>Google Cloud - SP (sa-east1)</p></div>
+                           </div>
+                           <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
                         </div>
-                        <div>
-                          <div className="flex justify-between mb-1"><span className={`text-[10px] font-bold ${theme.textMain}`}>Integração Transportadoras</span><span className="text-[10px] font-bold text-amber-500">Instável</span></div>
-                          <div className={`w-full ${isDark ? 'bg-slate-800' : 'bg-slate-100'} rounded-full h-1.5`}><div className="bg-amber-500 h-1.5 rounded-full w-[80%] animate-pulse"></div></div>
+                        <div className={`flex items-center justify-between p-3 rounded-lg border ${theme.border} ${isDark ? 'bg-slate-800/50' : 'bg-slate-50'}`}>
+                           <div className="flex items-center gap-3">
+                             <Wifi className={`w-4 h-4 ${theme.textSec}`}/>
+                             <div><p className={`text-[10px] font-black uppercase ${theme.textMain}`}>Banco de Dados Réplica</p></div>
+                           </div>
+                           <span className="text-[9px] font-black text-indigo-500 bg-indigo-500/10 px-2 py-0.5 rounded uppercase">Sincronizado</span>
                         </div>
                       </div>
                    </div>
+
                 </div>
               )}
              </div>
           )}
 
-          {/* =========================================
-              ABA 4: ROTAS E MAPA 
+          {/*
+          =========================================
+              ABA 4: ROTAS (AGORA COM 8 MOTORISTAS)
           ============================================= */}
           {activeTab === 'rotas' && (
             <div className="space-y-6 animate-in fade-in duration-500">
                <div>
                   <h2 className={`text-2xl md:text-3xl font-black ${theme.textMain} tracking-tight`}>Monitoramento</h2>
-                  <p className={`${theme.textSec} font-bold text-sm mt-1`}>Telemetria em tempo real de frota.</p>
+                  <p className={`${theme.textSec} font-bold text-sm mt-1`}>Telemetria em tempo real de toda a frota espalhada.</p>
               </div>
 
-              <div className={`relative w-full h-[250px] md:h-[350px] ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-slate-300 border-white'} rounded-3xl overflow-hidden border-[6px] shadow-lg mb-6`}>
+              <div className={`relative w-full h-[250px] md:h-[400px] ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-slate-300 border-white'} rounded-3xl overflow-hidden border-[6px] shadow-xl mb-8`}>
                 <iframe 
                   src="https://www.openstreetmap.org/export/embed.html?bbox=-46.8,-23.7,-46.4,-23.4&layer=mapnik" 
                   className={`absolute inset-0 w-full h-full pointer-events-none transition-all duration-500 ${isDark ? 'grayscale contrast-125 brightness-50 hue-rotate-180 invert opacity-60' : 'grayscale sepia-[0.1] contrast-125 opacity-80'}`}
                   style={{ border: 0 }}
                   title="Mapa Real"
                 />
-                                
+                
                 {MOCK_ROUTES.map((route, idx) => {
-                   const positions = [ { top: '40%', left: '30%' }, { top: '65%', right: '25%' }, { bottom: '20%', left: '50%' }, { top: '20%', right: '40%' } ];
+                   const positions = [ 
+                     { top: '30%', left: '20%' }, { top: '65%', right: '25%' }, { bottom: '20%', left: '40%' }, { top: '25%', right: '35%' },
+                     { top: '50%', left: '70%' }, { bottom: '35%', right: '10%' }, { top: '15%', left: '50%' }, { bottom: '10%', left: '10%' }
+                   ];
                    const pos = positions[idx % positions.length];
-                   const isAlert = route.status === 'Atrasado';
+                   const isAlert = route.status === 'Atrasado' || route.status === 'Parado';
 
                    return (
                      <div key={route.id} onClick={() => setSelectedRoute(route)} className="absolute transform -translate-x-1/2 -translate-y-1/2 group cursor-pointer" style={pos}>
-                        <div className={`absolute inset-0 ${isAlert ? 'bg-red-500' : 'bg-indigo-500'} rounded-full animate-ping opacity-50 scale-150`}></div>
-                        <Avatar name={route.driver} className={`relative w-10 h-10 md:w-12 md:h-12 border-2 ${isAlert ? 'border-red-500' : 'border-indigo-500'} shadow-lg group-hover:scale-110 transition-transform z-10`} />
+                        <div className={`absolute inset-0 ${isAlert ? 'bg-red-500' : 'bg-indigo-500'} rounded-full animate-ping opacity-60 scale-[1.7]`}></div>
+                        <Avatar name={route.driver} className={`relative w-10 h-10 md:w-14 md:h-14 border-2 ${isAlert ? 'border-red-500' : 'border-indigo-500'} shadow-xl group-hover:scale-110 transition-transform z-10`} />
                      </div>
                    );
                 })}
                 
-                <div className={`absolute bottom-3 left-3 ${isDark ? 'bg-slate-900/90 text-white border-slate-700' : 'bg-white/90 text-slate-800 border-slate-200'} backdrop-blur-md px-3 py-1.5 rounded-lg text-[10px] font-bold shadow-md border flex items-center gap-2`}>
-                   <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Satélite Sincronizado
+                <div className={`absolute bottom-4 left-4 ${isDark ? 'bg-slate-900/90 text-white border-slate-700' : 'bg-white/90 text-slate-800 border-slate-200'} backdrop-blur-md px-4 py-2 rounded-xl text-xs font-black shadow-lg border flex items-center gap-2`}>
+                   <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span> 8 Veículos Monitorados
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* GRID EXPANDIDO PARA 8 ROTAS */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5">
                 {MOCK_ROUTES.map((route) => (
-                  <button key={route.id} onClick={() => setSelectedRoute(route)} className={`text-left ${theme.card} p-5 rounded-2xl border ${theme.border} ${theme.cardHover} transition-all duration-200 group w-full`}>
+                  <button key={route.id} onClick={() => setSelectedRoute(route)} className={`text-left ${theme.card} p-5 md:p-6 rounded-2xl border ${theme.border} ${theme.cardHover} transition-all duration-200 group w-full`}>
                     <div className="flex justify-between items-start mb-5 w-full">
                       <div className="flex items-center gap-3">
-                         <Avatar name={route.driver} className="w-10 h-10" />
+                         <Avatar name={route.driver} className="w-12 h-12" />
                          <div>
-                            <p className={`font-black text-sm ${theme.textMain} leading-tight`}>{route.driver}</p>
-                            <p className={`text-[9px] font-black ${theme.textSec} ${isDark ? 'bg-slate-800' : 'bg-slate-100'} inline-block px-1.5 py-0.5 rounded uppercase mt-1`}>{route.plate}</p>
+                            <p className={`font-black text-sm md:text-base ${theme.textMain} leading-tight`}>{route.driver}</p>
+                            <p className={`text-[9px] md:text-[10px] font-black ${theme.textSec} ${isDark ? 'bg-slate-800' : 'bg-slate-100'} inline-block px-1.5 py-0.5 rounded uppercase mt-1`}>{route.plate}</p>
                          </div>
                       </div>
                     </div>
-                    <div className="mb-4">
-                      <p className={`text-[9px] ${theme.textSec} font-black uppercase tracking-widest mb-0.5`}>Local</p>
-                      <p className={`text-xs font-bold ${theme.textMain} truncate`}>{route.location}</p>
+                    <div className="mb-5">
+                      <p className={`text-[9px] md:text-[10px] ${theme.textSec} font-black uppercase tracking-widest mb-1`}><MapPin className="w-3 h-3 inline mr-0.5 text-indigo-500"/> Local Atual</p>
+                      <p className={`text-xs md:text-sm font-bold ${theme.textMain} truncate`}>{route.location}</p>
                     </div>
-                    <div className={`pt-3 border-t ${theme.border} flex justify-between items-center w-full`}>
-                       <span className={`px-2.5 py-1 text-[9px] font-black uppercase tracking-wider rounded-lg ${getStatusColor(route.status)}`}>{route.status}</span>
-                       <ChevronRight className={`w-4 h-4 ${theme.textSec} group-hover:text-indigo-500`} />
+                    <div className={`pt-4 border-t ${theme.border} flex justify-between items-center w-full`}>
+                       <span className={`px-2.5 py-1 text-[9px] md:text-[10px] font-black uppercase tracking-wider rounded-lg ${getStatusColor(route.status)}`}>{route.status}</span>
+                       <ChevronRight className={`w-5 h-5 ${theme.textSec} group-hover:text-indigo-500`} />
                     </div>
                   </button>
                 ))}
@@ -615,9 +667,50 @@ export default function App() {
       </main>
 
       {/* =====================================================================
-          MODAIS E POPUPS (TODOS FUNCIONAIS)
+          MODAIS E POPUPS (AGORA COM O MODAL DE SISTEMA)
       ===================================================================== */}
       
+      {/* 0. NOVO MODAL: Detalhes do Sistema de Rastreio */}
+      {selectedSystem && (
+         <Modal title="Diagnóstico de Rede" onClose={() => setSelectedSystem(null)}>
+           <div className="space-y-5">
+             <div className={`${theme.modalContentBg} border ${theme.border} p-6 rounded-3xl flex items-center gap-5 shadow-sm`}>
+               <div className={`p-4 rounded-2xl bg-${selectedSystem.color}/10`}>
+                 <Server className={`w-10 h-10 text-${selectedSystem.color}`} />
+               </div>
+               <div>
+                 <p className={`text-[10px] font-black uppercase tracking-widest ${theme.textSec}`}>Serviço Conectado</p>
+                 <h3 className={`font-black text-2xl ${theme.textMain} mb-1`}>{selectedSystem.name}</h3>
+                 <span className={`inline-block px-2.5 py-1 text-[10px] font-black uppercase rounded-lg text-${selectedSystem.color} bg-${selectedSystem.color}/10 border border-${selectedSystem.color}/20`}>Status: {selectedSystem.status}</span>
+               </div>
+             </div>
+             <div className="grid grid-cols-2 gap-4">
+               <div className={`${theme.modalContentBg} border ${theme.border} p-5 rounded-2xl text-center`}>
+                  <Activity className="w-6 h-6 text-indigo-500 mx-auto mb-2 opacity-50"/>
+                  <p className={`text-[10px] font-black uppercase ${theme.textSec} tracking-widest`}>Latência (Ping)</p>
+                  <p className={`text-3xl font-black ${theme.textMain}`}>{selectedSystem.ping}</p>
+               </div>
+               <div className={`${theme.modalContentBg} border ${theme.border} p-5 rounded-2xl text-center`}>
+                  <ShieldAlert className="w-6 h-6 text-indigo-500 mx-auto mb-2 opacity-50"/>
+                  <p className={`text-[10px] font-black uppercase ${theme.textSec} tracking-widest`}>Uptime (30 dias)</p>
+                  <p className={`text-3xl font-black ${theme.textMain}`}>{selectedSystem.uptime}</p>
+               </div>
+             </div>
+             <div className={`${theme.modalContentBg} border ${theme.border} p-5 rounded-2xl`}>
+               <p className={`text-xs font-black uppercase tracking-widest ${theme.textMain} mb-3 flex items-center gap-2`}><History className="w-4 h-4"/> Log de Eventos</p>
+               <div className={`text-xs ${theme.textSec} space-y-3 font-mono bg-slate-950 text-emerald-400 p-4 rounded-xl`}>
+                 <p>&gt; [{new Date().toLocaleTimeString()}] Handshake SSL estabelecido.</p>
+                 <p>&gt; [{new Date(Date.now() - 30000).toLocaleTimeString()}] Resposta OK. Ping: {selectedSystem.ping}.</p>
+                 <p>&gt; [{new Date(Date.now() - 120000).toLocaleTimeString()}] Sincronizando lotes pendentes [BATCH-992]...</p>
+                 {selectedSystem.status === 'Instável' && (
+                   <p className="text-red-400">&gt; AVISO: Perda de pacotes detectada na porta 443.</p>
+                 )}
+               </div>
+             </div>
+           </div>
+         </Modal>
+      )}
+
       {/* 1. Modal Estoque (Produto) */}
       {selectedProduct && (
         <Modal title="Info do WMS" onClose={() => setSelectedProduct(null)}>
@@ -783,7 +876,7 @@ export default function App() {
           </div>
         </Modal>
       )}
-            
+      
       {/* 5. Modal Trânsito KPI */}
       {activeModal === 'transito' && (
         <Modal title="Frota em Rota" onClose={() => setActiveModal(null)}>
@@ -891,10 +984,9 @@ export default function App() {
                   <button className="bg-emerald-100 text-emerald-700 px-4 py-2.5 rounded-xl text-xs font-black flex items-center gap-2 hover:bg-emerald-200 ml-auto border border-emerald-200"><CheckCircle2 className="w-4 h-4"/> Marcar como Resolvido</button>
                </div>
             </div>
-          </div>
-        </Modal>
+          </Modal>
       )}
-
+      
       {/* 8. Modal SLA KPI */}
       {activeModal === 'sla' && (
         <Modal title="Desempenho SLA" onClose={() => setActiveModal(null)}>

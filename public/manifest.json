@@ -1,22 +1,18 @@
 {
-  "name": "Sistema Logístico Cubbo",
-  "short_name": "Cubbo",
-  "description": "Painel de gestão de estoque e rastreamento de envios",
-  "start_url": "/",
+  "short_name": "Logisync",
+  "name": "LOGISYNC Inteligência Logística",
+  "start_url": ".",
   "display": "standalone",
-  "background_color": "#f8fafc",
-  "theme_color": "#1e293b",
+  "theme_color": "#4f46e5",
+  "background_color": "#0f172a",
   "icons": [
     {
-      "src": "/icon-192.png",
-      "sizes": "192x192",
+      "src": "https://res.cloudinary.com/dnymahpi7/image/upload/v1774140758/07382777-0894-423e-aa45-82e631bfb19e_dqyty4.png",
+      "sizes": "192x192 512x512",
       "type": "image/png",
       "purpose": "any maskable"
-    },
-    {
-      "src": "/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png"
     }
   ]
 }
+
+
